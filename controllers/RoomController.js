@@ -14,6 +14,7 @@ const addRoomItem = (req, res) => {
   const item = { name, imageUrl, posX, posY };
   room.equipItem(item);
   res.status(201).json({ message: 'Item equipado con éxito.', item });
+  console.log('Items actuales:', room.getItems());
 };
 
 const resetRoom = (req, res) => {
