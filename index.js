@@ -10,8 +10,6 @@ app.use(express.json());
 
 // Importar rutas
 const roomRoutes = require('./routes/RoomRoutes');
-
-// Rutas
 app.use('/api/room', roomRoutes);
 
 // Ruta de prueba

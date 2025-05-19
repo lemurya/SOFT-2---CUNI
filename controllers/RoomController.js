@@ -1,4 +1,5 @@
-const room = require('../Room/RoomSingleton');
+const room = require('../services/RoomSingleton');
+const getDecoratorByName = require('../utils/DecoratorFactory');
 
 //get
 const getRoomItems = (req, res) => {
@@ -13,13 +14,21 @@ const addRoomItem = (req, res) => {
     return res.status(400).json({ error: 'Faltan campos obligatorios.' });
   }
 
+  const Decorator = getDecoratorByName(name);
+  if (!Decorator) {
+    return res.status(400).json({ error: 'Tipo de ítem no reconocido.' });
+  }
+
   const item = { name, imageUrl, posX, posY };
-  room.equipItem(item);
-  res.status(201).json({ message: 'Item equipado con éxito.', item });
-  console.log('Items actuales:', room.getItems());
+  room.equipItem(Decorator, item);
+
+  res.status(201).json({
+    message: 'Item decorado con éxito.',
+    items: room.getItems()
+  });
 };
 
-//restar(delete)
+//delete
 const resetRoom = (req, res) => {
   room.clearItems();
   res.json({ message: 'Habitación reiniciada.' });
