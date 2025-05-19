@@ -1,9 +1,11 @@
 const room = require('../Room/RoomSingleton');
 
+//get
 const getRoomItems = (req, res) => {
   res.json(room.getItems());
 };
 
+//post
 const addRoomItem = (req, res) => {
   const { name, imageUrl, posX, posY } = req.body;
 
@@ -17,6 +19,7 @@ const addRoomItem = (req, res) => {
   console.log('Items actuales:', room.getItems());
 };
 
+//restar(delete)
 const resetRoom = (req, res) => {
   room.clearItems();
   res.json({ message: 'Habitación reiniciada.' });
