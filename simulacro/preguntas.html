@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Simulacro</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="inicio" style="display:none;"></div>
+
+    <div id="simulacro" style="display:none;">
+    <div id="contenedor-preguntas"></div>
+    <button id="finalizar-btn" onclick="calcularResultados()" style="display:none;">Finalizar</button>
+    </div>
+
+
+    <div id="resultado" style="display:none;">
+    <h2>Resultados</h2>
+    <pre id="detalle-resultado"></pre>
+    <button onclick="reiniciar()">Volver</button>
+    </div>
+
+
+  <script src="simulacro.js"></script>
+</body>
+</html>
