@@ -37,4 +37,60 @@ function login(req, res) {
   });
 }
 
-module.exports = { registrarUsuario, login };
+const cambiarContrasena = async (req, res) => {
+  try {
+    const { correo, usuario_id, contrasena_actual, contrasena_nueva } = req.body;
+
+    if (!contrasena_actual || !contrasena_nueva || (!usuario_id && !correo)) {
+      return res.status(400).json({ mensaje: 'Faltan campos obligatorios' });
+    }
+
+    const usuario = usuario_id
+      ? await getUsuarioById(usuario_id)
+      : await getUsuarioByCorreo(correo);
+
+    if (!usuario) {
+      return res.status(404).json({ mensaje: 'Usuario no encontrado' });
+    }
+
+    if (usuario.contrasena !== contrasena_actual) {
+      return res.status(401).json({ mensaje: 'Contraseña actual incorrecta' });
+    }
+
+    db.run(`UPDATE usuarios SET contrasena = ? WHERE id = ?`, [contrasena_nueva, usuario.id], function (err) {
+      if (err) {
+        return res.status(500).json({ mensaje: 'Error al actualizar contraseña', error: err.message });
+      }
+      res.status(200).json({ mensaje: 'Contraseña actualizada correctamente.' });
+    });
+
+  } catch (error) {
+    console.error('Error al cambiar contraseña:', error);
+    res.status(500).json({ mensaje: 'Error interno del servidor.' });
+  }
+};
+
+function getUsuarioByCorreo(correo) {
+  return new Promise((resolve, reject) => {
+    db.get(`SELECT * FROM usuarios WHERE correo = ?`, [correo], (err, row) => {
+      if (err) reject(err);
+      else resolve(row);
+    });
+  });
+}
+
+function getUsuarioById(id) {
+  return new Promise((resolve, reject) => {
+    db.get(`SELECT * FROM usuarios WHERE id = ?`, [id], (err, row) => {
+      if (err) reject(err);
+      else resolve(row);
+    });
+  });
+}
+
+
+module.exports = {
+  registrarUsuario,
+  login,
+  cambiarContrasena
+};

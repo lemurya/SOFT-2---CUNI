@@ -1,0 +1,13 @@
+# Ignorar dependencias
+node_modules/
+
+# Ignorar base de datos
+*.sqlite
+*.db
+
+# Ignorar logs
+*.log
+
+# Otros
+.env
+.DS_Store
