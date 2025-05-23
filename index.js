@@ -1,3 +1,4 @@
+const path = require('path');
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
@@ -10,13 +11,19 @@ app.use(express.json());
 
 // Importar rutas
 const roomRoutes = require('./routes/RoomRoutes');
+const simulacroRoutes = require('./routes/SimulacroRoutes'); 
 
-// Rutas
+// Rutas API
 app.use('/api/room', roomRoutes);
+app.use('/api/simulacro', simulacroRoutes);
 
-// Ruta de prueba
+// Servir archivos estáticos (simulacro/)
+const publicPath = path.join(__dirname, 'simulacro');
+app.use(express.static(publicPath));
+
+// Redirigir / → /simulacro.html
 app.get('/', (req, res) => {
-  res.send('Servidor backend funcionando (aiuda pls)');
+  res.redirect('/simulacro.html');
 });
 
 app.listen(PORT, () => {

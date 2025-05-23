@@ -1,0 +1,79 @@
+body {
+  font-family: Arial, sans-serif;
+  background-color: #a88cc9;
+  display: flex;
+  justify-content: center;
+  padding: 40px;
+}
+
+#contenedor {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 0 10px #ccc;
+  width: 100%;
+  max-width: 600px;
+}
+
+button {
+  padding: 10px 16px;
+  margin-top: 20px;
+  background-color: #6a1b9a;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #4a148c;
+}
+
+.custom-radios label {
+  display: block;
+  background: #ede7f6;
+  margin: 10px 0;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.custom-radios input[type="radio"] {
+  display: none;
+}
+
+.custom-radios input[type="radio"]:checked + span {
+  background: #d1c4e9;
+  font-weight: bold;
+}
+
+.custom-radios span {
+  display: block;
+}
+
+
+.cards-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+}
+
+.card {
+  background: #f4ebff;
+  border-radius: 12px;
+  padding: 20px;
+  margin: 20px auto;
+  width: 320px;
+  text-align: center;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.card {
+  background: #f5f5f5;
+  padding: 15px;
+  margin-bottom: 15px;
+  border-radius: 10px;
+  box-shadow: 0 0 8px #ccc;
+}
