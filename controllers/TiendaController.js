@@ -33,10 +33,26 @@ class TiendaController {
       res.json({
         mensaje: 'Compra exitosa',
         item: resultado.item,
-        monedas: resultado.monedasRestantes // 👈 aseguramos que se incluya
+        monedas: resultado.monedasRestantes
       });
     } catch (error) {
-      res.status(400).json(error); // ya contiene mensaje específico
+      res.status(400).json(error);
+    }
+  }
+
+  // ✅ NUEVO: activar ítem comprado
+  async usarItem(req, res) {
+    const { usuarioId, itemNombre } = req.body;
+
+    if (!usuarioId || !itemNombre) {
+      return res.status(400).json({ mensaje: 'Faltan datos para activar ítem' });
+    }
+
+    try {
+      const resultado = await tiendaService.activarItem(usuarioId, itemNombre);
+      res.json(resultado);
+    } catch (error) {
+      res.status(500).json(error);
     }
   }
 }

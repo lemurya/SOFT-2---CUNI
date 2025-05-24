@@ -1,14 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const tiendaController = require('../controllers/TiendaController');
+const TiendaController = require('../controllers/TiendaController');
 
-// GET /api/tienda/catalogo → lista de productos disponibles
-router.get('/catalogo', tiendaController.obtenerCatalogo);
-
-// GET /api/tienda/mis-items/:usuarioId → ítems comprados por un usuario
-router.get('/mis-items/:usuarioId', tiendaController.obtenerItemsComprados);
-
-// POST /api/tienda/comprar → comprar un ítem
-router.post('/comprar', tiendaController.comprarItem);
+// Rutas para la tienda
+router.get('/catalogo', TiendaController.obtenerCatalogo);
+router.get('/mis-items/:usuarioId', TiendaController.obtenerItemsComprados);
+router.post('/comprar', TiendaController.comprarItem);
+router.post('/usar-item', TiendaController.usarItem); // ✅ ESTA
 
 module.exports = router;
