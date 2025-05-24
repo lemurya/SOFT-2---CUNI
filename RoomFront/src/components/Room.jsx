@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import silla from '../assets/silla_gamer-removebg-preview.png';
-import mesa from '../assets/escritorio-removebg-preview.png';
+import silla from '../assets/silla.png';
+import mesa from '../assets/mesa.png';
+import habitacion from '../assets/room.jpg';  // Importamos la imagen de fondo
 
 const API_URL = 'http://localhost:3000/api/room';
 
@@ -12,6 +13,8 @@ const assetMap = {
 
 const Room = () => {
   const [items, setItems] = useState([]);
+  const [draggedItemIndex, setDraggedItemIndex] = useState(null);
+  const [offset, setOffset] = useState({ x: 0, y: 0 });
 
   const fetchItems = async () => {
     try {
@@ -34,7 +37,6 @@ const Room = () => {
         posX: `${Math.floor(Math.random() * 500)}px`,
         posY: `${Math.floor(Math.random() * 400)}px`,
       };
-
       await axios.post(API_URL, item);
       fetchItems();
     } catch (err) {
@@ -51,6 +53,44 @@ const Room = () => {
     }
   };
 
+  const handleMouseDown = (e, index) => {
+    setDraggedItemIndex(index);
+    const rect = e.target.getBoundingClientRect();
+    setOffset({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    });
+  };
+
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      if (draggedItemIndex === null) return;
+
+      const roomRect = document.querySelector('.room').getBoundingClientRect();
+      const x = e.clientX - roomRect.left - offset.x;
+      const y = e.clientY - roomRect.top - offset.y;
+
+      setItems((prevItems) => {
+        const updated = [...prevItems];
+        updated[draggedItemIndex].posX = `${x}px`;
+        updated[draggedItemIndex].posY = `${y}px`;
+        return updated;
+      });
+    };
+
+    const handleMouseUp = () => {
+      setDraggedItemIndex(null);
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [draggedItemIndex, offset]);
+
   return (
     <div>
       <div className="controls">
@@ -59,7 +99,18 @@ const Room = () => {
         <button onClick={resetRoom}>Resetear Habitación</button>
       </div>
 
-      <div className="room">
+      <div
+        className="room"
+        style={{
+          backgroundImage: `url(${habitacion})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          position: 'relative',
+          width: '100vw',
+          height: '100vh',
+          overflow: 'hidden',
+        }}
+      >
         {items.map((item, index) => (
           <img
             key={index}
@@ -68,8 +119,15 @@ const Room = () => {
             className="item"
             style={{
               left: item.posX || '50px',
-              top: item.posY || '50px'
+              top: item.posY || '50px',
+              position: 'absolute',
+              cursor: 'grab',
+              width: '200px',
+              height: 'auto',
+              userSelect: 'none',
             }}
+            onMouseDown={(e) => handleMouseDown(e, index)}
+            draggable={false}  // para evitar conflicto con drag nativo
           />
         ))}
       </div>
