@@ -52,10 +52,21 @@ function obtenerPerfil(req, res) {
   });
 }
 
+function obtenerPerfilPorId(req, res) {
+  const { id } = req.query;
+
+  db.get("SELECT nombre, correo, experiencia, monedas FROM usuarios WHERE id = ?", [id], (err, row) => {
+    if (err || !row) return res.status(404).json({ mensaje: 'Perfil no encontrado' });
+    res.json({ perfil: row });
+  });
+}
+
+
 module.exports = {
   registrarUsuario,
   login,
   cambiarContrasena,
   actualizarNombre,
-  obtenerPerfil
+  obtenerPerfil,
+  obtenerPerfilPorId
 };

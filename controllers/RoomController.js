@@ -1,4 +1,3 @@
-
 const RoomManager = require('../managers/RoomManager');
 const SillaDecorator = require('../decorators/SillaDecorator');
 const MesaDecorator = require('../decorators/MesaDecorator');
@@ -24,13 +23,24 @@ const getRoomItems = async (req, res) => {
 };
 
 const addRoomItem = async (req, res) => {
-  const { usuario_id, tipo, datos } = req.body;
-  if (!usuario_id || !tipo || !datos) return res.status(400).json({ error: 'Faltan datos requeridos' });
+  let { usuario_id, tipo, datos } = req.body;
+  if (!usuario_id || !tipo || !datos) {
+    return res.status(400).json({ error: 'Faltan datos requeridos' });
+  }
 
-  const Decorador = decoradores[tipo] || decoradores.default;
+  // Normalizar tipo
+  const tipoLimpio = tipo.trim().toLowerCase();
+
+  // Reforzar consistencia del imageUrl
+  const datosLimpios = {
+    ...datos,
+    imageUrl: tipoLimpio,
+  };
+
+  const Decorador = decoradores[tipoLimpio] || decoradores.default;
 
   try {
-    await RoomManager.equipItem(usuario_id, tipo, datos);
+    await RoomManager.equipItem(usuario_id, tipoLimpio, datosLimpios);
     const room = await RoomManager.getRoom(usuario_id);
     res.status(201).json({ mensaje: 'Ítem agregado', items: room.getItems() });
   } catch (err) {
