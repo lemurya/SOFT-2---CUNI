@@ -3,6 +3,7 @@ import {
   Box, Typography, Paper, Button, RadioGroup, FormControlLabel,
   Radio, FormControl, InputLabel, Select, MenuItem
 } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 const Simulacro = () => {
   const [usuario, setUsuario] = useState(null);
@@ -12,6 +13,7 @@ const Simulacro = () => {
   const [finalizado, setFinalizado] = useState(false);
   const [temaSeleccionado, setTemaSeleccionado] = useState('');
   const [temas] = useState(["matematica", "verbal", "ciencias", "historia"]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const datos = JSON.parse(localStorage.getItem('usuario'));
@@ -58,7 +60,6 @@ const Simulacro = () => {
   const verResultados = async () => {
     const res = await fetch(`http://localhost:3000/api/simulacro/${usuario.id}/resultados`);
     const data = await res.json();
-    alert(`Total: ${data.total}\nCorrectas: ${data.correctas}\nIncorrectas: ${data.incorrectas}`);
 
     const actualizado = {
       ...usuario,
@@ -67,50 +68,84 @@ const Simulacro = () => {
     };
 
     localStorage.setItem("usuario", JSON.stringify(actualizado));
-    setUsuario(actualizado);
+    navigate('/resultados', { state: data });
   };
 
   const preguntaActual = preguntas[indiceActual];
 
   return (
-    <Paper sx={{ p: 4 }}>
-      {!preguntas.length ? (
-        <Box>
-          <Typography variant="h6" gutterBottom>Selecciona un tema para comenzar</Typography>
-          <FormControl fullWidth sx={{ mb: 2 }}>
-            <InputLabel>Tema</InputLabel>
-            <Select
-              value={temaSeleccionado}
-              label="Tema"
-              onChange={(e) => setTemaSeleccionado(e.target.value)}
+    <Box
+      sx={{
+        minHeight: '100vh',
+        bgcolor: '#F9F6FF',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        px: 2
+      }}
+    >
+      <Paper
+        elevation={3}
+        sx={{
+          p: 4,
+          maxWidth: 600,
+          width: '100%',
+          borderRadius: 4
+        }}
+      >
+        {!preguntas.length ? (
+          <Box>
+            <Typography variant="h5" gutterBottom fontWeight="bold">
+              Selecciona un tema para comenzar
+            </Typography>
+
+            <FormControl fullWidth sx={{ my: 2 }}>
+              <InputLabel>Tema</InputLabel>
+              <Select
+                value={temaSeleccionado}
+                label="Tema"
+                onChange={(e) => setTemaSeleccionado(e.target.value)}
+              >
+                {temas.map((tema) => (
+                  <MenuItem key={tema} value={tema}>
+                    {tema.charAt(0).toUpperCase() + tema.slice(1)}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+
+            <Button
+              variant="contained"
+              onClick={iniciarSimulacro}
+              sx={{ bgcolor: '#5D3FD3', '&:hover': { bgcolor: '#4528a4' }, borderRadius: 2 }}
+              fullWidth
             >
-              {temas.map((tema) => (
-                <MenuItem key={tema} value={tema}>{tema}</MenuItem>
+              Iniciar Simulacro
+            </Button>
+          </Box>
+        ) : finalizado ? (
+          <Box textAlign="center">
+            <Typography variant="h6" gutterBottom>Simulacro finalizado</Typography>
+            <Button variant="contained" onClick={verResultados}>Ver resultados</Button>
+          </Box>
+        ) : (
+          <Box>
+            <Typography variant="h6" fontWeight="bold">
+              Pregunta {indiceActual + 1}
+            </Typography>
+            <Typography sx={{ my: 2 }}>{preguntaActual?.question}</Typography>
+            <RadioGroup value={respuesta} onChange={(e) => setRespuesta(e.target.value)}>
+              {preguntaActual?.options.map((opt, i) => (
+                <FormControlLabel key={i} value={opt} control={<Radio />} label={opt} />
               ))}
-            </Select>
-          </FormControl>
-          <Button variant="contained" onClick={iniciarSimulacro}>Iniciar Simulacro</Button>
-        </Box>
-      ) : finalizado ? (
-        <Box>
-          <Typography variant="h6" gutterBottom>Simulacro finalizado</Typography>
-          <Button variant="contained" onClick={verResultados}>Ver resultados</Button>
-        </Box>
-      ) : (
-        <Box>
-          <Typography variant="h6">Pregunta {indiceActual + 1}</Typography>
-          <Typography sx={{ my: 2 }}>{preguntaActual?.question}</Typography>
-          <RadioGroup value={respuesta} onChange={(e) => setRespuesta(e.target.value)}>
-            {preguntaActual?.options.map((opt, i) => (
-              <FormControlLabel key={i} value={opt} control={<Radio />} label={opt} />
-            ))}
-          </RadioGroup>
-          <Button variant="contained" onClick={responder} sx={{ mt: 2 }}>
-            Responder
-          </Button>
-        </Box>
-      )}
-    </Paper>
+            </RadioGroup>
+            <Button variant="contained" onClick={responder} sx={{ mt: 2 }}>
+              Responder
+            </Button>
+          </Box>
+        )}
+      </Paper>
+    </Box>
   );
 };
 

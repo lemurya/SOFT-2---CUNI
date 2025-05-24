@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
-  Box, Typography, Paper, Avatar
+  Box, Typography, Paper, Avatar, Grid
 } from '@mui/material';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
@@ -12,7 +12,13 @@ const Dashboard = () => {
     const datos = JSON.parse(localStorage.getItem('usuario'));
     setUsuario(datos);
   }, []);
-
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, []);
+  
   if (!usuario) {
     return (
       <Box sx={{ p: 4 }}>
@@ -24,36 +30,52 @@ const Dashboard = () => {
   return (
     <Box
       sx={{
-        minHeight: '100vh',
-        bgcolor: '#F9F6FF',
+        height: '100%', // NO usar minHeight
+        bgcolor: '#F3F0FF',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        p: 4
+        overflow: 'hidden', // evita scroll extra
+        paddingTop: '64px', // compensar AppBar
+        boxSizing: 'border-box'
       }}
     >
-      <Paper sx={{ p: 4, maxWidth: 500, width: '100%', borderRadius: 4 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-          <Avatar sx={{ width: 64, height: 64, bgcolor: '#836FFF', mr: 2 }}>
-            {usuario.nombre[0]?.toUpperCase()}
-          </Avatar>
-          <Box>
-            <Typography variant="h5" fontWeight="bold">{usuario.nombre}</Typography>
-            <Typography variant="body2" color="text.secondary">{usuario.correo}</Typography>
-          </Box>
-        </Box>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-          <Box sx={{ textAlign: 'center' }}>
-            <EmojiEventsIcon sx={{ fontSize: 40, color: '#FFD700' }} />
-            <Typography variant="h6">{usuario.experiencia} XP</Typography>
-            <Typography variant="body2">Experiencia</Typography>
-          </Box>
-          <Box sx={{ textAlign: 'center' }}>
-            <MonetizationOnIcon sx={{ fontSize: 40, color: '#4CAF50' }} />
-            <Typography variant="h6">{usuario.monedas}</Typography>
-            <Typography variant="body2">Monedas</Typography>
-          </Box>
-        </Box>
+
+      <Paper elevation={3} sx={{ p: 5, borderRadius: 4, maxWidth: 900, width: '100%' }}>
+        <Grid container spacing={4} alignItems="center" justifyContent="center">
+          <Grid item xs={12} md={4} sx={{ textAlign: 'center' }}>
+            <img src="/img/cuni.png" alt="Cuni" style={{ width: '180px' }} />
+          </Grid>
+
+          <Grid item xs={12} md={8}>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+              <Avatar sx={{ width: 80, height: 80, bgcolor: '#836FFF', mr: 3 }}>
+                {usuario.nombre[0]?.toUpperCase()}
+              </Avatar>
+              <Box>
+                <Typography variant="h4" fontWeight="bold">{usuario.nombre}</Typography>
+                <Typography variant="body1" color="text.secondary">{usuario.correo}</Typography>
+              </Box>
+            </Box>
+
+            <Grid container spacing={4}>
+              <Grid item xs={6}>
+                <Box sx={{ textAlign: 'center' }}>
+                  <EmojiEventsIcon sx={{ fontSize: 50, color: '#FFD700' }} />
+                  <Typography variant="h5">{usuario.experiencia} XP</Typography>
+                  <Typography variant="body1">Experiencia</Typography>
+                </Box>
+              </Grid>
+              <Grid item xs={6}>
+                <Box sx={{ textAlign: 'center' }}>
+                  <MonetizationOnIcon sx={{ fontSize: 50, color: '#4CAF50' }} />
+                  <Typography variant="h5">{usuario.monedas}</Typography>
+                  <Typography variant="body1">Monedas</Typography>
+                </Box>
+              </Grid>
+            </Grid>
+          </Grid>
+        </Grid>
       </Paper>
     </Box>
   );
