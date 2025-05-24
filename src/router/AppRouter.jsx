@@ -9,6 +9,7 @@ import Sidebar from '../components/Sidebar';
 import CambiarContrasena from '../components/CambiarContrasena';
 import Resultados from '../components/Resultados';
 import CambiarNombre from '../components/CambiarNombre';
+import Room from '../components/Room';
 
 
 const AppRouter = () => {
@@ -22,6 +23,8 @@ const AppRouter = () => {
       <Route path="/resultados" element={<Sidebar><Resultados /></Sidebar>} />
       <Route path="/cambiar-contrasena" element={<CambiarContrasena />} />
       <Route path="/cambiar-nombre" element={<Sidebar><CambiarNombre /></Sidebar>} />
+      <Route path="/room" element={<Sidebar><Room /></Sidebar>} />
+
     </Routes>
   );
 };

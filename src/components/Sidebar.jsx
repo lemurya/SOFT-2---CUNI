@@ -11,6 +11,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { useNavigate } from 'react-router-dom';
 import { useSnackbar } from '../context/SnackbarContext';
+import ChairIcon from '@mui/icons-material/Chair';
 
 const Sidebar = ({ children }) => {
   const [open, setOpen] = useState(false);
@@ -38,7 +39,9 @@ const Sidebar = ({ children }) => {
     { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
     { text: 'Simulacro', icon: <QuizIcon />, path: '/simulacro' },
     { text: 'Reportes', icon: <AssessmentIcon />, path: '/reportes' },
-    { text: 'Cambiar nombre', icon: <EditIcon />, path: '/cambiar-nombre' }
+    { text: 'Cambiar nombre', icon: <EditIcon />, path: '/cambiar-nombre' },
+    { text: 'Habitación', icon: <ChairIcon />, path: '/room' }
+
   ];
 
   return (
