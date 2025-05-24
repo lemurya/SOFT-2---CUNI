@@ -1,0 +1,56 @@
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f5f0ff;
+    color: #4a0063;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 20px;
+    background: #fff0ff;
+    border-radius: 12px;
+    box-shadow: 0 0 10px rgba(74, 0, 99, 0.2);
+    text-align: center;
+}
+
+h1 {
+    color: #6a1b9a;
+}
+
+.ropa-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.ropa-item {
+    background-color: #ede7f6;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 0 4px #bbb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+button {
+    background-color: #9c27b0;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #7b1fa2;
+}
+
+.mensaje {
+    margin-top: 20px;
+    font-weight: bold;
+}
