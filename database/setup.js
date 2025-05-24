@@ -1,3 +1,4 @@
+// src/database/setup.js
 const db = require('./db');
 
 db.serialize(() => {
@@ -26,5 +27,17 @@ db.serialize(() => {
       FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
     )
   `);
-  
+
+  // Tabla de ítems de la habitación
+  db.run(`
+    CREATE TABLE IF NOT EXISTS room_items (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      usuario_id INTEGER NOT NULL,
+      tipo TEXT NOT NULL,
+      datos TEXT NOT NULL,
+      FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+    )
+  `);
+
+  console.log("✅ Tablas creadas correctamente.");
 });

@@ -14,11 +14,12 @@ app.use(express.json());
 const userRoutes = require('./routes/UserRoutes');
 const simulacroRoutes = require('./routes/SimulacroRoutes');
 const reporteRoutes = require('./routes/ReporteRoutes');
-
+const roomRoutes = require('./routes/RoomRoutes');
 // Usar las rutas
 app.use('/api/usuarios', userRoutes);
 app.use('/api/simulacro', simulacroRoutes);
 app.use('/api/reportes', reporteRoutes);
+app.use('/api/room', roomRoutes);
 
 // Servir archivos estáticos desde /front
 const publicPath = path.join(__dirname, 'front');
