@@ -1,5 +1,3 @@
-npm install recharts
-
 import React, { useEffect, useState } from 'react';
 import {
   Box, Typography, Button, Stack, Grid, Card, CardContent, Divider
@@ -14,7 +12,7 @@ const Reportes = () => {
   const [temaSeleccionado, setTemaSeleccionado] = useState(null);
   const temas = ['matematica', 'verbal', 'ciencias', 'historia'];
 
-  // Cargar usuario desde localStorage al montar el componente
+  // Cargar usuario desde localStorage
   useEffect(() => {
     const datos = JSON.parse(localStorage.getItem('usuario'));
     setUsuario(datos);
@@ -30,7 +28,7 @@ const Reportes = () => {
     }
   }, [usuario]);
 
-  // Filtrado por tema
+  // Filtrar reportes por tema
   const reportesFiltrados = temaSeleccionado
     ? reportes.filter(r => r.tema.toLowerCase() === temaSeleccionado)
     : reportes;
@@ -55,8 +53,8 @@ const Reportes = () => {
     };
   });
 
-  // Datos para gráfico (por examen)
-  const datosGrafico = [...reportes]
+  // Gráfico de evolución solo con reportes filtrados
+  const datosGrafico = [...reportesFiltrados]
     .sort((a, b) => new Date(a.fecha) - new Date(b.fecha))
     .map((r, index) => ({
       examen: `Intento ${index + 1}`,
@@ -97,25 +95,31 @@ const Reportes = () => {
         ))}
       </Grid>
 
-      {/* Gráfico de evolución por examen */}
+      {/* Gráfico por Examen (filtrado) */}
       <Card sx={{ mb: 4 }} elevation={2}>
         <CardContent>
           <Typography variant="h6" gutterBottom>
-            Evolución de aciertos por intento
+            Evolución de aciertos {temaSeleccionado ? `(${temaSeleccionado})` : ''}
           </Typography>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={datosGrafico}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="examen" />
-              <YAxis allowDecimals={false} />
-              <Tooltip />
-              <Line type="monotone" dataKey="aciertos" stroke="#1976d2" />
-            </LineChart>
-          </ResponsiveContainer>
+          {datosGrafico.length === 0 ? (
+            <Typography variant="body2" color="text.secondary">
+              No hay datos para mostrar en el gráfico.
+            </Typography>
+          ) : (
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={datosGrafico}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="examen" />
+                <YAxis allowDecimals={false} />
+                <Tooltip />
+                <Line type="monotone" dataKey="aciertos" stroke="#1976d2" />
+              </LineChart>
+            </ResponsiveContainer>
+          )}
         </CardContent>
       </Card>
 
-      {/* Filtros por tema */}
+      {/* Filtros por Tema */}
       <Stack spacing={2} direction="row" justifyContent="center" flexWrap="wrap" sx={{ mb: 4 }}>
         <Button
           variant={temaSeleccionado === null ? "contained" : "outlined"}
@@ -134,7 +138,7 @@ const Reportes = () => {
         ))}
       </Stack>
 
-      {/* Lista de reportes */}
+      {/* Lista de Reportes */}
       {reportesFiltrados.length === 0 ? (
         <Typography align="center" color="text.secondary">
           No hay reportes para este tema.
