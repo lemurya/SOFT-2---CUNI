@@ -13,6 +13,8 @@ const Simulacro = () => {
   const [finalizado, setFinalizado] = useState(false);
   const [temaSeleccionado, setTemaSeleccionado] = useState('');
   const [temas] = useState(["matematica", "verbal", "ciencias", "historia"]);
+  const [tiempo, setTiempo] = useState(300); // 300 segundos = 5 minutos
+  const [temporizadorActivo, setTemporizadorActivo] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -38,6 +40,9 @@ const Simulacro = () => {
     setIndiceActual(0);
     setFinalizado(false);
     setRespuesta('');
+
+     setTiempo(300); 
+     setTemporizadorActivo(true);
   };
 
   const responder = async () => {
@@ -70,6 +75,22 @@ const Simulacro = () => {
     localStorage.setItem("usuario", JSON.stringify(actualizado));
     navigate('/resultados', { state: data });
   };
+
+  useEffect(() => {
+  let intervalo = null;
+
+  if (temporizadorActivo && tiempo > 0) {
+    intervalo = setInterval(() => {
+      setTiempo((prev) => prev - 1);
+    }, 1000);
+  } else if (tiempo === 0 && preguntas.length > 0 && !finalizado) {
+    setFinalizado(true);
+    alert("⏰ El tiempo ha terminado. Se cerró el simulacro automáticamente.");
+    clearInterval(intervalo);
+}
+
+  return () => clearInterval(intervalo);
+}, [temporizadorActivo, tiempo, preguntas, finalizado]);
 
   const preguntaActual = preguntas[indiceActual];
 
@@ -114,6 +135,10 @@ const Simulacro = () => {
               </Select>
             </FormControl>
 
+            <Typography variant="body2" align="center" sx={{ mb: 2 }}>
+              Tiempo disponible: {Math.floor(tiempo / 60)}:{(tiempo % 60).toString().padStart(2, '0')} minutos
+            </Typography>
+
             <Button
               variant="contained"
               onClick={iniciarSimulacro}
@@ -133,6 +158,11 @@ const Simulacro = () => {
             <Typography variant="h6" fontWeight="bold">
               Pregunta {indiceActual + 1}
             </Typography>
+
+            <Typography variant="body2" align="center" sx={{ mb: 2, color: tiempo < 30 ? 'red' : 'inherit' }}>
+            Tiempo restante: {Math.floor(tiempo / 60)}:{(tiempo % 60).toString().padStart(2, '0')}
+            </Typography>
+
             <Typography sx={{ my: 2 }}>{preguntaActual?.question}</Typography>
             <RadioGroup value={respuesta} onChange={(e) => setRespuesta(e.target.value)}>
               {preguntaActual?.options.map((opt, i) => (
@@ -148,5 +178,6 @@ const Simulacro = () => {
     </Box>
   );
 };
+
 
 export default Simulacro;
