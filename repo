@@ -5,6 +5,8 @@ import {
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
 } from 'recharts';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 const Reportes = () => {
   const [usuario, setUsuario] = useState(null);
@@ -12,13 +14,11 @@ const Reportes = () => {
   const [temaSeleccionado, setTemaSeleccionado] = useState(null);
   const temas = ['matematica', 'verbal', 'ciencias', 'historia'];
 
-  // Cargar usuario desde localStorage
   useEffect(() => {
     const datos = JSON.parse(localStorage.getItem('usuario'));
     setUsuario(datos);
   }, []);
 
-  // Cargar reportes cuando el usuario esté disponible
   useEffect(() => {
     if (usuario?.id) {
       fetch(`http://localhost:3000/api/reportes/${usuario.id}`)
@@ -28,19 +28,20 @@ const Reportes = () => {
     }
   }, [usuario]);
 
-  // Filtrar reportes por tema
   const reportesFiltrados = temaSeleccionado
     ? reportes.filter(r => r.tema.toLowerCase() === temaSeleccionado)
     : reportes;
 
-  // Estadísticas generales
   const totalSimulacros = reportes.length;
   const totalCorrectas = reportes.reduce((sum, r) => sum + r.correctas, 0);
   const totalPreguntas = reportes.reduce((sum, r) => sum + r.total, 0);
-  const porcentajeGlobal = totalPreguntas > 0 ? ((totalCorrectas / totalPreguntas) * 100).toFixed(1) : 0;
-  const ultimaFecha = reportes.length > 0 ? new Date(Math.max(...reportes.map(r => new Date(r.fecha)))).toLocaleString() : '---';
+  const porcentajeGlobal = totalPreguntas > 0
+    ? ((totalCorrectas / totalPreguntas) * 100).toFixed(1)
+    : 0;
+  const ultimaFecha = reportes.length > 0
+    ? new Date(Math.max(...reportes.map(r => new Date(r.fecha)))).toLocaleString()
+    : '---';
 
-  // Estadísticas por tema
   const estadisticasPorTema = temas.map(tema => {
     const reportesTema = reportes.filter(r => r.tema === tema);
     const totalC = reportesTema.reduce((sum, r) => sum + r.correctas, 0);
@@ -53,7 +54,6 @@ const Reportes = () => {
     };
   });
 
-  // Gráfico de evolución solo con reportes filtrados
   const datosGrafico = [...reportesFiltrados]
     .sort((a, b) => new Date(a.fecha) - new Date(b.fecha))
     .map((r, index) => ({
@@ -61,13 +61,51 @@ const Reportes = () => {
       aciertos: r.correctas,
     }));
 
+  const generarPDF = () => {
+    const doc = new jsPDF();
+    doc.setFontSize(16);
+    doc.text('Reporte de Simulacros', 14, 20);
+
+    doc.setFontSize(12);
+    doc.text(`Usuario: ${usuario?.nombre || 'N/A'}`, 14, 30);
+    doc.text(`Total de simulacros: ${totalSimulacros}`, 14, 38);
+    doc.text(`Porcentaje global de aciertos: ${porcentajeGlobal}%`, 14, 46);
+    doc.text(`Último intento: ${ultimaFecha}`, 14, 54);
+
+    autoTable(doc, {
+      startY: 64,
+      head: [['Tema', 'Intentos', 'Promedio Aciertos', 'Porcentaje']],
+      body: estadisticasPorTema.map(e => [
+        e.tema.toUpperCase(),
+        e.intentos,
+        e.promedio,
+        `${e.porcentaje}%`
+      ])
+    });
+
+    autoTable(doc, {
+      startY: doc.lastAutoTable.finalY + 10,
+      head: [['Tema', 'Correctas', 'Total', 'Fecha', 'Hora']],
+      body: reportesFiltrados.map(r => [
+        r.tema,
+        r.correctas,
+        r.total,
+        new Date(r.fecha).toLocaleDateString(),
+        new Date(r.fecha).toLocaleTimeString()
+      ]),
+      theme: 'striped',
+      styles: { fontSize: 10 },
+    });
+
+    doc.save(`reporte_${usuario?.nombre || 'usuario'}.pdf`);
+  };
+
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: '#F9F6FF', px: 6, py: 8 }}>
       <Typography variant="h4" align="center" gutterBottom fontWeight="bold">
         Historial de Reportes
       </Typography>
 
-      {/* Resumen General */}
       <Card sx={{ mb: 4 }} elevation={2}>
         <CardContent>
           <Typography variant="h6" gutterBottom>Resumen General</Typography>
@@ -77,7 +115,6 @@ const Reportes = () => {
         </CardContent>
       </Card>
 
-      {/* Estadísticas por Tema */}
       <Grid container spacing={2} sx={{ mb: 4 }}>
         {estadisticasPorTema.map((e, i) => (
           <Grid item xs={12} sm={6} md={3} key={i}>
@@ -95,7 +132,6 @@ const Reportes = () => {
         ))}
       </Grid>
 
-      {/* Gráfico por Examen (filtrado) */}
       <Card sx={{ mb: 4 }} elevation={2}>
         <CardContent>
           <Typography variant="h6" gutterBottom>
@@ -119,8 +155,7 @@ const Reportes = () => {
         </CardContent>
       </Card>
 
-      {/* Filtros por Tema */}
-      <Stack spacing={2} direction="row" justifyContent="center" flexWrap="wrap" sx={{ mb: 4 }}>
+      <Stack spacing={2} direction="row" justifyContent="center" flexWrap="wrap" sx={{ mb: 2 }}>
         <Button
           variant={temaSeleccionado === null ? "contained" : "outlined"}
           onClick={() => setTemaSeleccionado(null)}
@@ -136,9 +171,15 @@ const Reportes = () => {
             REPORTE DE {tema.toUpperCase()}
           </Button>
         ))}
+        <Button variant="outlined" color="secondary" onClick={generarPDF}>
+          Descargar PDF
+        </Button>
       </Stack>
 
-      {/* Lista de Reportes */}
+      <Typography variant="h6" gutterBottom>
+        📋 Historial de Exámenes {temaSeleccionado ? `(${temaSeleccionado})` : ''}
+      </Typography>
+
       {reportesFiltrados.length === 0 ? (
         <Typography align="center" color="text.secondary">
           No hay reportes para este tema.
@@ -149,12 +190,17 @@ const Reportes = () => {
             <Grid item xs={12} sm={6} md={4} key={index}>
               <Card elevation={3}>
                 <CardContent>
-                  <Typography variant="h6" gutterBottom>
-                    {r.tema.charAt(0).toUpperCase() + r.tema.slice(1)}: {r.correctas}/{r.total}
+                  <Typography variant="subtitle1" fontWeight="bold">
+                    Tema: {r.tema.charAt(0).toUpperCase() + r.tema.slice(1)}
                   </Typography>
-                  <Divider sx={{ my: 1 }} />
-                  <Typography variant="body2" color="text.secondary">
-                    Fecha: {new Date(r.fecha).toLocaleString()}
+                  <Typography variant="body2">
+                    Resultado: {r.correctas} correctas de {r.total}
+                  </Typography>
+                  <Typography variant="body2">
+                    Fecha: {new Date(r.fecha).toLocaleDateString()}
+                  </Typography>
+                  <Typography variant="body2">
+                    Hora: {new Date(r.fecha).toLocaleTimeString()}
                   </Typography>
                 </CardContent>
               </Card>
