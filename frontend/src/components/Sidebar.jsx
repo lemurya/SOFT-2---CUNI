@@ -53,7 +53,7 @@ const Sidebar = ({ children }) => {
     <Box sx={{ display: 'flex' }}>
       <AppBar
         position="fixed"
-        sx={{ zIndex: 1300, bgcolor: '#5D3FD3' }} // Morado oscuro
+        sx={{ zIndex: 1300, bgcolor: '#473870' }} // Morado oscuro
       >
         <Toolbar>
           <IconButton color="inherit" edge="start" onClick={toggleDrawer}>

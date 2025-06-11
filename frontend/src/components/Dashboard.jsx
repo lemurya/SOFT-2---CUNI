@@ -58,7 +58,7 @@ const Dashboard = () => {
 
           <Grid item xs={12} md={8}>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-              <Avatar sx={{ width: 80, height: 80, bgcolor: '#836FFF', mr: 3 }}>
+              <Avatar sx={{ width: 80, height: 80, bgcolor: '#7F6FAE', mr: 3 }}>
                 {usuario.nombre[0]?.toUpperCase()}
               </Avatar>
               <Box>

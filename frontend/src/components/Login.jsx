@@ -119,7 +119,7 @@ const Login = () => {
               sx={{
                 mt: 2,
                 bgcolor: '#5D3FD3',
-                '&:hover': { bgcolor: '#4B2FCF' },
+                '&:hover': { bgcolor: '#7F6FAE' },
                 borderRadius: 2
               }}
             >

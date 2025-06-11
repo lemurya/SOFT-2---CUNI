@@ -44,8 +44,8 @@ const Inventario = () => {
   }, [usuario.id]);
 
   return (
-    <Box sx={{ padding: 4, bgcolor: '#F3F0FF', minHeight: '100vh' }}>
-      <Typography variant="h4" fontWeight="bold" gutterBottom color="#5D3FD3">
+    <Box sx={{ padding: 4, bgcolor: '#FFFCEC', minHeight: '100vh' }}>
+      <Typography variant="h4" fontWeight="bold" gutterBottom color="#7F6FAE">
         Inventario
       </Typography>
 
@@ -69,7 +69,7 @@ const Inventario = () => {
                   <Button
                     variant="contained"
                     onClick={() => activarItem(item.nombre)}
-                    sx={{ mt: 2, bgcolor: '#5D3FD3', '&:hover': { bgcolor: '#4528A4' } }}
+                    sx={{ mt: 2, bgcolor: '#7F6FAE', '&:hover': { bgcolor: '#473870' } }}
                   >
                     Usar
                   </Button>
