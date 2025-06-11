@@ -61,44 +61,89 @@ const Reportes = () => {
       aciertos: r.correctas,
     }));
 
-  const generarPDF = () => {
-    const doc = new jsPDF();
-    doc.setFontSize(16);
-    doc.text('Reporte de Simulacros', 14, 20);
-
-    doc.setFontSize(12);
-    doc.text(`Usuario: ${usuario?.nombre || 'N/A'}`, 14, 30);
-    doc.text(`Total de simulacros: ${totalSimulacros}`, 14, 38);
-    doc.text(`Porcentaje global de aciertos: ${porcentajeGlobal}%`, 14, 46);
-    doc.text(`Último intento: ${ultimaFecha}`, 14, 54);
-
-    autoTable(doc, {
-      startY: 64,
-      head: [['Tema', 'Intentos', 'Promedio Aciertos', 'Porcentaje']],
-      body: estadisticasPorTema.map(e => [
-        e.tema.toUpperCase(),
-        e.intentos,
-        e.promedio,
-        `${e.porcentaje}%`
-      ])
-    });
-
-    autoTable(doc, {
-      startY: doc.lastAutoTable.finalY + 10,
-      head: [['Tema', 'Correctas', 'Total', 'Fecha', 'Hora']],
-      body: reportesFiltrados.map(r => [
-        r.tema,
-        r.correctas,
-        r.total,
-        new Date(r.fecha).toLocaleDateString(),
-        new Date(r.fecha).toLocaleTimeString()
-      ]),
-      theme: 'striped',
-      styles: { fontSize: 10 },
-    });
-
-    doc.save(`reporte_${usuario?.nombre || 'usuario'}.pdf`);
-  };
+    const generarPDF = async () => {
+      const doc = new jsPDF();
+      const logoUrl = "/img/cuni.png";
+    
+      // Cargar logo como base64
+      const getImageBase64 = (url) =>
+        fetch(url)
+          .then(res => res.blob())
+          .then(blob => new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result);
+            reader.readAsDataURL(blob);
+          }));
+    
+      const logoBase64 = await getImageBase64(logoUrl);
+    
+      // Encabezado con logo y título
+      doc.addImage(logoBase64, 'PNG', 10, 10, 25, 25);
+      doc.setFontSize(16);
+      doc.text("Reporte de Simulacros", 40, 20);
+      doc.setFontSize(10);
+      doc.text(`Fecha de generación: ${new Date().toLocaleString()}`, 40, 32);
+    
+      // Información del usuario
+      let y = 45;
+      doc.setFontSize(12);
+      doc.text(`Usuario: ${usuario?.nombre || 'N/A'}`, 14, y); y += 8;
+      doc.text(`Total de simulacros: ${totalSimulacros}`, 14, y); y += 8;
+      doc.text(`Porcentaje global de aciertos: ${porcentajeGlobal}%`, 14, y); y += 8;
+      doc.text(`Último intento: ${ultimaFecha}`, 14, y); y += 6;
+    
+      // Tabla: Estadísticas por tema
+      autoTable(doc, {
+        startY: y + 4,
+        head: [['Tema', 'Intentos', 'Prom. Aciertos', 'Porcentaje']],
+        body: estadisticasPorTema.map(e => [
+          e.tema.toUpperCase(),
+          e.intentos,
+          e.promedio,
+          `${e.porcentaje}%`
+        ]),
+        theme: 'striped',
+        styles: { fontSize: 10, halign: 'center' },
+        headStyles: { fillColor: [22, 160, 133] }
+      });
+    
+      // Tabla: Historial detallado
+      autoTable(doc, {
+        startY: doc.lastAutoTable.finalY + 10,
+        head: [['Tema', 'Respuestas Correctas', 'Total Preguntas', 'Fecha', 'Hora']],
+        body: reportesFiltrados.map(r => [
+          r.tema,
+          r.correctas,
+          r.total,
+          new Date(r.fecha).toLocaleDateString(),
+          new Date(r.fecha).toLocaleTimeString()
+        ]),
+        theme: 'grid',
+        styles: { fontSize: 10 },
+        headStyles: { fillColor: [52, 152, 219] }
+      });
+    
+      // Recomendaciones automáticas
+      const recomendaciones = estadisticasPorTema
+        .filter(t => Number(t.porcentaje) < 70)
+        .map(t => `- Reforzar el tema de ${t.tema.toUpperCase()} (${t.porcentaje}%)`);
+    
+      if (recomendaciones.length === 0) {
+        recomendaciones.push("- El rendimiento es adecuado en todos los temas evaluados.");
+      }
+    
+      let ry = doc.lastAutoTable.finalY + 10;
+      doc.setFontSize(12);
+      doc.text("Recomendaciones del sistema:", 14, ry); ry += 6;
+      doc.setFontSize(10);
+      recomendaciones.forEach(r => {
+        doc.text(r, 18, ry);
+        ry += 6;
+      });
+    
+      doc.save(`reporte_${usuario?.nombre || 'usuario'}.pdf`);
+    };
+    
 
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: '#F9F6FF', px: 6, py: 8 }}>
