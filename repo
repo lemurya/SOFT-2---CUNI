@@ -1,3 +1,4 @@
+&&npm install recharts jspdf jspdf-autotable
 import React, { useEffect, useState } from 'react';
 import {
   Box, Typography, Button, Stack, Grid, Card, CardContent, Divider
