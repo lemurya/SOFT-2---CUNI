@@ -15,6 +15,61 @@ db.serialize(() => {
     )
   `);
 
+    //Tabla de preguntas
+    db.run(`
+      CREATE TABLE IF NOT EXISTS preguntas (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        pregunta TEXT NOT NULL,
+        opciones TEXT NOT NULL, -- JSON con opciones
+        correcta TEXT NOT NULL,
+        tema TEXT NOT NULL
+      )
+  `);
+  const preguntasIniciales = {
+  matematica: [
+    { question: "Si 5x − 3 = 2x + 12, ¿cuál es el valor de x?", options: ["5", "1", "3", "7"], correct: "5" },
+    { question: "¿Cuál es el número que sigue en la serie: 2, 6, 12, 20, 30...?", options: ["36", "40", "42", "48"], correct: "42" },
+    { question: "Resuelve: (x + 3)(x − 2) = 0. ¿Cuál es una raíz?", options: ["−3", "2", "−2", "3"], correct: "2" }
+  ],
+  verbal: [
+    { question: "Seleccione el sinónimo de 'elocuente':", options: ["Callado", "Persuasivo", "Tímido", "Inseguro"], correct: "Persuasivo" },
+    { question: "¿Cuál es la palabra que completa correctamente la analogía? Agua es a líquido como hielo es a:", options: ["gas", "sólido", "plasma", "niebla"], correct: "sólido" },
+    { question: "Seleccione el antónimo de 'beligerante':", options: ["Agresivo", "Pacífico", "Violento", "Conflictivo"], correct: "Pacífico" }
+  ],
+  ciencias: [
+    { question: "¿Cuál es la función principal de los glóbulos rojos?", options: ["Defender contra infecciones", "Transportar oxígeno", "Coagular sangre", "Formar huesos"], correct: "Transportar oxígeno" },
+    { question: "¿Qué ley de Newton explica la acción y reacción?", options: ["Primera", "Segunda", "Tercera", "Cuarta"], correct: "Tercera" },
+    { question: "¿Qué parte de la célula controla sus funciones?", options: ["Mitocondria", "Citoplasma", "Núcleo", "Membrana"], correct: "Núcleo" }
+  ],
+  historia: [
+    { question: "¿Quién proclamó la independencia del Perú en 1821?", options: ["Simón Bolívar", "José de San Martín", "Miguel Grau", "Ramón Castilla"], correct: "José de San Martín" },
+    { question: "¿Cuál fue la civilización que construyó Chan Chan?", options: ["Moche", "Chimú", "Nazca", "Inca"], correct: "Chimú" },
+    { question: "¿En qué año se dio la Revolución Francesa?", options: ["1789", "1776", "1810", "1804"], correct: "1789" }
+  ]
+};
+
+db.get(`SELECT COUNT(*) as count FROM preguntas`, (err, row) => {
+  if (err) {
+    console.error("❌ Error al verificar preguntas:", err);
+  } else if (row.count === 0) {
+    const stmt = db.prepare(`
+      INSERT INTO preguntas (pregunta, opciones, correcta, tema)
+      VALUES (?, ?, ?, ?)
+    `);
+
+    for (const tema in preguntasIniciales) {
+      preguntasIniciales[tema].forEach(p => {
+        stmt.run(p.question, JSON.stringify(p.options), p.correct, tema);
+      });
+    }
+
+    stmt.finalize(() => {
+      console.log("✅ Preguntas iniciales insertadas en la base de datos.");
+    });
+  }
+});
+
+
   // Tabla de reportes
   db.run(`
     CREATE TABLE IF NOT EXISTS reportes (

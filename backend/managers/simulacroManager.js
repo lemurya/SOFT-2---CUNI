@@ -1,45 +1,65 @@
-
-const preguntasPorTema = require('../data/preguntas.json');
+const db = require('../database/db');
 
 const sesiones = {};
 
-const iniciar = (userId, tema) => {
-  if (!preguntasPorTema[tema]) return null;
+const obtenerPreguntasDesdeDB = (tema) => {
+  return new Promise((resolve, reject) => {
+    db.all(`SELECT * FROM preguntas WHERE tema = ?`, [tema], (err, rows) => {
+      if (err) return reject(err);
 
-  sesiones[userId] = {
-    tema,
-    preguntas: [...preguntasPorTema[tema]],
-    indice: 0,
-    correctas: 0,
-    responder(respuesta) {
-      const actual = this.preguntas[this.indice];
-      if (!actual) return;
-      if (respuesta === actual.correct) this.correctas++;
-      this.indice++;
-    },
-    getActual() {
-      return this.preguntas[this.indice];
-    },
-    terminado() {
-      return this.indice >= this.preguntas.length;
-    },
-    resultados() {
-      return {
-        total: this.preguntas.length,
-        correctas: this.correctas,
-        incorrectas: this.preguntas.length - this.correctas
-      };
-    }
-  };
+      const preguntas = rows.map(row => ({
+        id: row.id,
+        pregunta: row.pregunta,
+        opciones: JSON.parse(row.opciones),
+        correct: row.correcta
+      }));
 
-  return sesiones[userId];
+      resolve(preguntas);
+    });
+  });
+};
+
+const iniciar = async (userId, tema) => {
+  try {
+    const preguntas = await obtenerPreguntasDesdeDB(tema);
+    if (!preguntas.length) return null;
+
+    sesiones[userId] = {
+      tema,
+      preguntas,
+      correctas: 0,
+      respuestas: Array(preguntas.length).fill(null), 
+    };
+
+    return sesiones[userId];
+  } catch (err) {
+    console.error("Error al obtener preguntas de DB:", err);
+    return null;
+  }
+};
+
+const responder = (userId, respuesta, indice) => {
+  const sesion = sesiones[userId];
+  if (!sesion || !sesion.preguntas[indice]) return;
+
+  // Evitar doble evaluación
+  if (sesion.respuestas[indice] !== null) return;
+
+  const pregunta = sesion.preguntas[indice];
+  sesion.respuestas[indice] = respuesta;
+
+  if (respuesta === pregunta.correct) {
+    sesion.correctas++;
+  }
 };
 
 const get = (userId) => sesiones[userId];
+
 const terminar = (userId) => delete sesiones[userId];
 
 module.exports = {
   iniciar,
+  responder,
   get,
   terminar
 };
