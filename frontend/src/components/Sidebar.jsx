@@ -9,11 +9,11 @@ import QuizIcon from '@mui/icons-material/Quiz';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import EditIcon from '@mui/icons-material/Edit';
 import LogoutIcon from '@mui/icons-material/Logout';
-import { useNavigate } from 'react-router-dom';
-import { useSnackbar } from '../context/SnackbarContext';
 import ChairIcon from '@mui/icons-material/Chair';
 import StoreIcon from '@mui/icons-material/Store';
 import InventoryIcon from '@mui/icons-material/Inventory';
+import { useNavigate } from 'react-router-dom';
+import { useSnackbar } from '../context/SnackbarContext';
 
 const Sidebar = ({ children }) => {
   const [open, setOpen] = useState(false);
@@ -45,16 +45,11 @@ const Sidebar = ({ children }) => {
     { text: 'Habitación', icon: <ChairIcon />, path: '/room' },
     { text: 'Tienda', icon: <StoreIcon />, path: '/tienda' },
     { text: 'Personalizar', icon: <InventoryIcon />, path: '/inventario' }
-
-
   ];
 
   return (
     <Box sx={{ display: 'flex' }}>
-      <AppBar
-        position="fixed"
-        sx={{ zIndex: 1300, bgcolor: '#473870' }} // Morado oscuro
-      >
+      <AppBar position="fixed" sx={{ zIndex: 1300, bgcolor: '#473870' }}>
         <Toolbar>
           <IconButton color="inherit" edge="start" onClick={toggleDrawer}>
             <MenuIcon />
@@ -68,45 +63,50 @@ const Sidebar = ({ children }) => {
         </Toolbar>
       </AppBar>
 
-
       <Drawer open={open} onClose={toggleDrawer}>
-  <Box sx={{ width: 250, bgcolor: '#F9F6FF', height: '100%' }} onClick={toggleDrawer}>
-    <Typography variant="h6" align="center" sx={{ py: 2 }}>
-      CUNI
-    </Typography>
-    <Divider />
-    <List>
-      {items.map(item => (
-        <ListItem
-          button
-          key={item.text}
-          onClick={() => {
-            navigate(item.path);
-            setOpen(false);
-          }}
+        <Box
+          sx={{ width: 250, bgcolor: '#F9F6FF', height: '100%' }}
+          onClick={toggleDrawer}
         >
-          <ListItemIcon sx={{ color: '#333' }}>{item.icon}</ListItemIcon>
-          <ListItemText primary={item.text} />
-        </ListItem>
-      ))}
-      <Divider sx={{ my: 1 }} />
-      <ListItem button onClick={() => setConfirmLogout(true)}>
-        <ListItemIcon sx={{ color: '#333' }}><LogoutIcon /></ListItemIcon>
-        <ListItemText primary="Cerrar sesión" />
-      </ListItem>
-    </List>
-  </Box>
-</Drawer>
+          <Typography variant="h6" align="center" sx={{ py: 2 }}>
+            CUNI
+          </Typography>
+          <Divider />
+          <List>
+            {items.map(item => (
+              <ListItem
+                button
+                key={item.text}
+                onClick={() => {
+                  navigate(item.path);
+                  setOpen(false);
+                }}
+              >
+                <ListItemIcon sx={{ color: '#333' }}>{item.icon}</ListItemIcon>
+                <ListItemText primary={item.text} />
+              </ListItem>
+            ))}
+            <Divider sx={{ my: 1 }} />
+            <ListItem button onClick={() => setConfirmLogout(true)}>
+              <ListItemIcon sx={{ color: '#333' }}><LogoutIcon /></ListItemIcon>
+              <ListItemText primary="Cerrar sesión" />
+            </ListItem>
+          </List>
+        </Box>
+      </Drawer>
 
-
-      <Box component="main" sx={{
-        flexGrow: 1,
-        mt: 8,
-        p: 2,
-        width: '100%',
-        height: 'calc(100vh - 64px)', // altura sin AppBar
-        overflow: 'hidden'
-      }}>
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          mt: 8,
+          p: 2,
+          width: '100%',
+          minHeight: '100vh',
+          overflowY: 'auto',
+          bgcolor: '#F9F6FF'
+        }}
+      >
         {children}
       </Box>
 
@@ -114,7 +114,9 @@ const Sidebar = ({ children }) => {
         <DialogTitle>¿Deseas cerrar sesión?</DialogTitle>
         <DialogActions>
           <Button onClick={() => setConfirmLogout(false)}>Cancelar</Button>
-          <Button onClick={confirmarCerrarSesion} color="error" variant="contained">Cerrar sesión</Button>
+          <Button onClick={confirmarCerrarSesion} color="error" variant="contained">
+            Cerrar sesión
+          </Button>
         </DialogActions>
       </Dialog>
     </Box>
