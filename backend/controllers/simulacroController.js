@@ -1,11 +1,10 @@
-
 const manager = require('../managers/simulacroManager');
 const Reporte = require('../models/Reporte');
 const db = require('../database/db');
 
-const iniciarSimulacro = (req, res) => {
+const iniciarSimulacro = async (req, res) => {
   const { userId, tema } = req.body;
-  const sesion = manager.iniciar(userId, tema);
+  const sesion = await manager.iniciar(userId, tema);
   if (!sesion) return res.status(404).json({ error: 'Tema no válido' });
   res.json({ mensaje: 'Simulacro iniciado', total: sesion.preguntas.length });
 };
@@ -19,11 +18,16 @@ const obtenerTodas = (req, res) => {
 
 const responder = (req, res) => {
   const { userId } = req.params;
-  const { respuesta } = req.body;
+  const { respuesta, indice } = req.body;
+
+  if (!respuesta || indice === undefined) {
+    return res.status(400).json({ error: 'Datos incompletos' });
+  }
+
   const sesion = manager.get(userId);
   if (!sesion) return res.status(404).json({ error: 'No hay simulacro activo' });
-  if (sesion.terminado()) return res.status(400).json({ error: 'El simulacro ya ha finalizado' });
-  sesion.responder(respuesta);
+
+  manager.responder(userId, respuesta, indice);
   res.json({ mensaje: 'Respuesta registrada' });
 };
 
@@ -32,15 +36,18 @@ const verResultados = async (req, res) => {
   const sesion = manager.get(userId);
   if (!sesion) return res.status(404).json({ error: 'No hay simulacro activo' });
 
-  const resultado = sesion.resultados();
-  const tema = sesion.tema || 'desconocido';
+  const resultado = {
+    total: sesion.preguntas.length,
+    correctas: sesion.correctas,
+    incorrectas: sesion.preguntas.length - sesion.correctas
+  };
 
-  const reporte = new Reporte(userId, tema, resultado.correctas, resultado.total);
   const experienciaGanada = resultado.correctas * 20;
   const monedasGanadas = resultado.correctas * 50;
+  const reporte = new Reporte(userId, sesion.tema, resultado.correctas, resultado.total);
 
   try {
-    const guardado = await reporte.guardarEnDB(db);
+    await reporte.guardarEnDB(db);
 
     await new Promise((resolve, reject) => {
       db.run(
@@ -55,30 +62,21 @@ const verResultados = async (req, res) => {
 
     res.json({
       mensaje: 'Simulacro finalizado',
-      total: resultado.total,
-      correctas: resultado.correctas,
-      incorrectas: resultado.incorrectas,
+      ...resultado,
       experienciaGanada,
-      monedasGanadas,
-      guardado
+      monedasGanadas
     });
-    
+
+    manager.terminar(userId); 
   } catch (error) {
     console.error('Error al guardar reporte o recompensas:', error);
     res.status(500).json({ mensaje: 'Error al guardar reporte o recompensas', error: error.message });
   }
 };
 
-const reiniciar = (req, res) => {
-  const { userId } = req.params;
-  manager.terminar(userId);
-  res.json({ mensaje: 'Simulacro reiniciado' });
-};
-
 module.exports = {
   iniciarSimulacro,
   obtenerTodas,
   responder,
-  verResultados,
-  reiniciar
+  verResultados
 };

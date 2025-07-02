@@ -14,7 +14,6 @@ router.post('/iniciar', iniciarSimulacro);
 router.get('/:userId/todas', obtenerTodas);
 router.post('/:userId/responder', responder);
 router.get('/:userId/resultados', verResultados);
-router.delete('/:userId/reiniciar', reiniciar);
 
 
 module.exports = router;

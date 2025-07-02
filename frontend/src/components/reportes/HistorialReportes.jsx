@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import {
-  Box, Typography, Card, CardContent, Grid, TextField, Divider,
-  MenuItem, Select, InputLabel, FormControl, Button
+  Box, Typography, Card, CardContent, TextField, Divider,
+  MenuItem, Select, InputLabel, FormControl, Button, Grid
 } from '@mui/material';
 import GraficoResultados from './GraficoResultados';
 import useHistorialReportes from './useHistorialReportes';
@@ -45,7 +45,7 @@ const HistorialReportes = () => {
 
       <Box sx={{ maxWidth: 900, mx: 'auto', mb: 4 }}>
         <Grid container spacing={2}>
-          <Grid item xs={12} sm={4}>
+          <Grid sx={{ flexBasis: { xs: '100%', sm: '33.33%' }, flexGrow: 1 }}>
             <FormControl fullWidth>
               <InputLabel>Curso</InputLabel>
               <Select
@@ -54,12 +54,15 @@ const HistorialReportes = () => {
                 onChange={(e) => setTemaSeleccionado(e.target.value)}
               >
                 {temas.map((tema, idx) => (
-                  <MenuItem key={idx} value={tema}>{tema.toUpperCase()}</MenuItem>
+                  <MenuItem key={idx} value={tema}>
+                    {tema.toUpperCase()}
+                  </MenuItem>
                 ))}
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={12} sm={4}>
+
+          <Grid sx={{ flexBasis: { xs: '100%', sm: '33.33%' }, flexGrow: 1 }}>
             <TextField
               label="Desde"
               type="date"
@@ -69,7 +72,8 @@ const HistorialReportes = () => {
               onChange={(e) => setFechaInicio(e.target.value)}
             />
           </Grid>
-          <Grid item xs={12} sm={4}>
+
+          <Grid sx={{ flexBasis: { xs: '100%', sm: '33.33%' }, flexGrow: 1 }}>
             <TextField
               label="Hasta"
               type="date"
