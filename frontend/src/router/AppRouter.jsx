@@ -4,8 +4,8 @@ import Login from '../components/Login';
 import Register from '../components/Register';
 import Dashboard from '../components/Dashboard';
 import Simulacro from '../components/Simulacro';
-import Reportes from '../components/Reportes';
-import HistorialReportes from '../components/HistorialReportes'; // ✅ Importación añadida
+import Reportes from '../components/reportes/Reportes';
+import HistorialReportes from '../components/reportes/HistorialReportes';
 import Sidebar from '../components/Sidebar';
 import CambiarContrasena from '../components/CambiarContrasena';
 import Resultados from '../components/Resultados';
@@ -22,7 +22,7 @@ const AppRouter = () => {
       <Route path="/dashboard" element={<Sidebar><Dashboard /></Sidebar>} />
       <Route path="/simulacro" element={<Sidebar><Simulacro /></Sidebar>} />
       <Route path="/reportes" element={<Sidebar><Reportes /></Sidebar>} />
-      <Route path="/historial" element={<Sidebar><HistorialReportes /></Sidebar>} /> {/* ✅ Ruta añadida */}
+      <Route path="/historial" element={<Sidebar><HistorialReportes /></Sidebar>} />
       <Route path="/resultados" element={<Sidebar><Resultados /></Sidebar>} />
       <Route path="/cambiar-contrasena" element={<CambiarContrasena />} />
       <Route path="/cambiar-nombre" element={<Sidebar><CambiarNombre /></Sidebar>} />
