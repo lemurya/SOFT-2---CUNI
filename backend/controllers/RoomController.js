@@ -47,7 +47,7 @@ const addRoomItem = async (req, res) => {
     res.status(201).json({ mensaje: 'Ítem agregado', items: room.getItems() });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Error al guardar ítem en la habitación' });
+    res.status(400).json({ error: err.message || 'Error al guardar ítem en la habitación' });
   }
 };
 
@@ -129,7 +129,7 @@ const getRoomItemResumen = async (req, res) => {
   }
 };
 
-
+//addRoomItem
 
 module.exports = { 
   getRoomItems, 

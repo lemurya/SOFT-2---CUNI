@@ -52,6 +52,10 @@ class RoomManager {
 
   async equipItem(usuarioId, tipo, datos) {
     console.log(' GUARDANDO ITEM:', usuarioId, tipo, datos);
+    const disponible = await this.verificarInventarioDisponible(usuarioId, tipo);
+    if (!disponible) {
+      throw new Error('No tienes este ítem en tu inventario o ya está completamente colocado');
+    }
 
     await new Promise((resolve, reject) => {
       db.run(
@@ -153,6 +157,30 @@ class RoomManager {
     this.rooms.delete(usuarioId);
   }  
   
+  async verificarInventarioDisponible(usuarioId, tipo) {
+    return new Promise((resolve, reject) => {
+      db.all(
+        `SELECT COUNT(*) as total FROM tienda_items_usuario WHERE usuario_id = ? AND tipo = ?`,
+        [usuarioId, tipo],
+        (err, rows1) => {
+          if (err) return reject(err);
+  
+          db.all(
+            `SELECT COUNT(*) as colocados FROM room_items WHERE usuario_id = ? AND tipo = ?`,
+            [usuarioId, tipo],
+            (err2, rows2) => {
+              if (err2) return reject(err2);
+  
+              const total = rows1[0].total;
+              const colocados = rows2[0].colocados;
+              resolve(total > colocados); // si aún tiene disponibles
+            }
+          );
+        }
+      );
+    });
+  }
+
 }
 
 module.exports = new RoomManager();

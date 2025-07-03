@@ -54,9 +54,21 @@ const Room = () => {
         datos: newItem
       })
     })
-      .then(res => res.json())
-      .then(data => setItems(data.items))
-      .catch(err => console.error('Error al agregar ítem', err));
+      .then(async res => {
+        const data = await res.json();
+        if (!res.ok) {
+          setError(data.error || 'No se pudo agregar el ítem');
+          setTimeout(() => setError(''), 3000);
+          return;
+        }
+        setItems(data.items);
+      })
+      .catch(err => {
+        console.error('Error al agregar ítem', err);
+        setError('Error de conexión');
+        setTimeout(() => setError(''), 3000);
+      });
+
   };
 
   // 🔄 Reset
