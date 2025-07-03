@@ -62,4 +62,39 @@ const resetRoom = async (req, res) => {
   }
 };
 
-module.exports = { getRoomItems, addRoomItem, resetRoom };
+const updateItemPosition = async (req, res) => {
+  const usuarioId = req.body.usuario_id;
+  const index = parseInt(req.params.index);
+  const newPos = req.body.posicion;
+
+  if (!usuarioId || isNaN(index) || !newPos) {
+    return res.status(400).json({ error: 'Datos incompletos o inválidos' });
+  }
+
+  try {
+    const result = await RoomManager.updateItemPosition(usuarioId, index, newPos);
+    res.json({ message: 'Posición actualizada', result });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error al actualizar posición' });
+  }
+};
+
+const guardarCambios = async (req, res) => {
+  const { usuario_id, items } = req.body;
+
+  if (!usuario_id || !Array.isArray(items)) {
+    return res.status(400).json({ error: 'Datos inválidos' });
+  }
+
+  try {
+    await RoomManager.guardarCambios(usuario_id, items);
+    res.json({ message: 'Cambios guardados correctamente' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error al guardar cambios' });
+  }
+};
+
+
+module.exports = { getRoomItems, addRoomItem, resetRoom, updateItemPosition, guardarCambios };

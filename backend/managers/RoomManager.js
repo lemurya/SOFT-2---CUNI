@@ -14,7 +14,7 @@ class RoomManager {
       return this.rooms.get(usuarioId);
     }
 
-    console.log('🔍 BUSCANDO ITEMS PARA USUARIO:', usuarioId);
+    console.log(' BUSCANDO ITEMS PARA USUARIO:', usuarioId);
 
     let room = new RoomBase();
     const items = await new Promise((resolve, reject) => {
@@ -23,10 +23,10 @@ class RoomManager {
         [usuarioId],
         (err, rows) => {
           if (err) {
-            console.error('❌ ERROR AL CARGAR ITEMS:', err);
+            console.error(' ERROR AL CARGAR ITEMS:', err);
             return reject(err);
           }
-          console.log('📦 ITEMS ENCONTRADOS:', rows);
+          console.log(' ITEMS ENCONTRADOS:', rows);
           resolve(rows);
         }
       );
@@ -51,7 +51,7 @@ class RoomManager {
   }
 
   async equipItem(usuarioId, tipo, datos) {
-    console.log('🟡 GUARDANDO ITEM:', usuarioId, tipo, datos);
+    console.log(' GUARDANDO ITEM:', usuarioId, tipo, datos);
 
     await new Promise((resolve, reject) => {
       db.run(
@@ -59,10 +59,10 @@ class RoomManager {
         [usuarioId, tipo, JSON.stringify(datos)],
         function (err) {
           if (err) {
-            console.error('❌ ERROR AL GUARDAR:', err);
+            console.error(' ERROR AL GUARDAR:', err);
             return reject(err);
           }
-          console.log('✅ ITEM GUARDADO');
+          console.log(' ITEM GUARDADO');
           resolve();
         }
       );
@@ -85,6 +85,74 @@ class RoomManager {
 
     this.rooms.delete(usuarioId);
   }
+
+  async updateItemPosition(usuarioId, index, newPos) {
+    const items = await new Promise((resolve, reject) => {
+      db.all(
+        'SELECT rowid, datos FROM room_items WHERE usuario_id = ?',
+        [usuarioId],
+        (err, rows) => {
+          if (err) return reject(err);
+          resolve(rows);
+        }
+      );
+    });
+  
+    if (index >= items.length) throw new Error('Ítem fuera de rango');
+  
+    const item = items[index];
+    const datos = JSON.parse(item.datos);
+    datos.posX = newPos.posX;
+    datos.posY = newPos.posY;
+  
+    return new Promise((resolve, reject) => {
+      db.run(
+        'UPDATE room_items SET datos = ? WHERE rowid = ?',
+        [JSON.stringify(datos), item.rowid],
+        function (err) {
+          if (err) return reject(err);
+          resolve({ updated: this.changes });
+        }
+      );
+    });
+  
+    // Refrescar caché
+    this.rooms.delete(usuarioId);
+  }
+  
+  async guardarCambios(usuarioId, items) {
+    // 1. Eliminar todos los ítems anteriores del usuario
+    await new Promise((resolve, reject) => {
+      db.run(
+        'DELETE FROM room_items WHERE usuario_id = ?',
+        [usuarioId],
+        function (err) {
+          if (err) return reject(err);
+          resolve();
+        }
+      );
+    });
+  
+    // 2. Insertar nuevos ítems con sus posiciones actualizadas
+    for (const item of items) {
+      const tipo = item.name;
+  
+      await new Promise((resolve, reject) => {
+        db.run(
+          'INSERT INTO room_items (usuario_id, tipo, datos) VALUES (?, ?, ?)',
+          [usuarioId, tipo, JSON.stringify(item)],
+          function (err) {
+            if (err) return reject(err);
+            resolve();
+          }
+        );
+      });
+    }
+  
+    // 3. Limpiar caché del room
+    this.rooms.delete(usuarioId);
+  }  
+  
 }
 
 module.exports = new RoomManager();
