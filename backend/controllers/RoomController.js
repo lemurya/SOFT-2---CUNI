@@ -3,6 +3,8 @@ const SillaDecorator = require('../decorators/SillaDecorator');
 const MesaDecorator = require('../decorators/MesaDecorator');
 const ItemDecorator = require('../decorators/ItemDecorator');
 
+const db = require('../database/db');
+
 const decoradores = {
   silla: SillaDecorator,
   mesa: MesaDecorator,
@@ -96,5 +98,44 @@ const guardarCambios = async (req, res) => {
   }
 };
 
+const getRoomItemResumen = async (req, res) => {
+  const usuarioId = req.query.usuario_id;
+  if (!usuarioId) return res.status(400).json({ error: 'usuario_id requerido' });
 
-module.exports = { getRoomItems, addRoomItem, resetRoom, updateItemPosition, guardarCambios };
+  console.log("🔍 Consultando resumen para usuario:", usuarioId);
+
+  try {
+    db.all(
+      `SELECT tipo FROM room_items WHERE usuario_id = ?`,
+      [usuarioId],
+      (err, rows) => {
+        if (err) {
+          console.error('❌ Error SQL:', err);
+          return res.status(500).json({ error: 'Error interno' });
+        }
+
+        const resumen = {};
+        rows.forEach(row => {
+          resumen[row.tipo] = (resumen[row.tipo] || 0) + 1;
+        });
+
+        console.log("📦 Resumen generado:", resumen);
+        res.json(resumen);
+      }
+    );
+  } catch (err) {
+    console.error('❌ Error general:', err);
+    res.status(500).json({ error: 'Error al procesar solicitud' });
+  }
+};
+
+
+
+module.exports = { 
+  getRoomItems, 
+  addRoomItem, 
+  resetRoom, 
+  updateItemPosition,
+  guardarCambios, 
+  getRoomItemResumen 
+};

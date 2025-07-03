@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useUsuario } from '../context/UserContext';
 import silla from '../assets/silla.png';
 import mesa from '../assets/mesa.png';
 import habitacion from '../assets/room.jpg';
@@ -13,18 +14,23 @@ const Room = () => {
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [error, setError] = useState('');
   const navigate = useNavigate();
-  const usuario_id = 1; // Aquí deberías usar el ID real del usuario autenticado
+
+  const { usuario } = useUsuario();
+  const usuario_id = usuario?.id;
 
   // 🔄 Cargar ítems al montar
   useEffect(() => {
+    if (!usuario_id) return;
     fetch(`http://localhost:3000/api/room?usuario_id=${usuario_id}`)
       .then(res => res.json())
       .then(data => setItems(data.items))
       .catch(err => console.error('Error al cargar habitación', err));
-  }, []);
+  }, [usuario_id]);
 
   // ➕ Agregar ítem (con validación)
   const addItem = (tipo) => {
+    if (!usuario_id) return;
+
     const count = items.filter(i => i.name === tipo).length;
     if (count >= 2) {
       setError(`Inventario insuficiente de ${tipo}`);
@@ -55,6 +61,8 @@ const Room = () => {
 
   // 🔄 Reset
   const resetRoom = () => {
+    if (!usuario_id) return;
+
     fetch(`http://localhost:3000/api/room?usuario_id=${usuario_id}`, {
       method: 'DELETE'
     })
@@ -88,6 +96,8 @@ const Room = () => {
   };
 
   const updateItemPosition = (index, newItem) => {
+    if (!usuario_id) return;
+
     fetch(`http://localhost:3000/api/room/${index}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -99,24 +109,24 @@ const Room = () => {
   };
 
   const guardarCambios = async () => {
+    if (!usuario_id) return;
+
     try {
       await fetch('http://localhost:3000/api/room/guardar', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          usuario_id: 1,  // <- ajusta si usas otro ID dinámico
+          usuario_id,
           items,
         }),
       });
-  
+
       alert('Cambios guardados correctamente.');
     } catch (error) {
       console.error('Error al guardar los cambios:', error);
       alert('Error al guardar los cambios.');
     }
   };
-  
-  
 
   const handleMouseUp = () => setDraggedItemIndex(null);
 
@@ -128,7 +138,6 @@ const Room = () => {
         <button onClick={resetRoom}>Resetear Habitación</button>
         <button onClick={guardarCambios}>Guardar Cambios</button>
         <button onClick={() => navigate('/inventario')}>Inventario</button>
-        
       </div>
 
       {error && (
