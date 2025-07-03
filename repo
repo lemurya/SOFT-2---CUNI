@@ -258,3 +258,11 @@ const Reportes = () => {
 };
 
 export default Reportes;
+
+
+
+//Hola porsiaca estoy usando este archivo ya que al parecer nadie lo va a usar para documentar los logros y no perderme en las verisones xd
+//roomv2 decorators con back
+//roomv3 back conectado al inventario del player
+//roomv4 con conexion a la tienda
+//room v5 ya con pruebas unitarias
