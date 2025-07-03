@@ -13,12 +13,12 @@ const Room = () => {
   const [draggedItemIndex, setDraggedItemIndex] = useState(null);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [error, setError] = useState('');
+  const [girar, setGirar] = useState(false); // ⭐ Nuevo estado
   const navigate = useNavigate();
 
   const { usuario } = useUsuario();
   const usuario_id = usuario?.id;
 
-  // 🔄 Cargar ítems al montar
   useEffect(() => {
     if (!usuario_id) return;
     fetch(`http://localhost:3000/api/room?usuario_id=${usuario_id}`)
@@ -27,7 +27,6 @@ const Room = () => {
       .catch(err => console.error('Error al cargar habitación', err));
   }, [usuario_id]);
 
-  // ➕ Agregar ítem (ahora sin límite artificial)
   const addItem = (tipo) => {
     if (!usuario_id) return;
 
@@ -63,10 +62,8 @@ const Room = () => {
       });
   };
 
-  // 🔄 Reset
   const resetRoom = () => {
     if (!usuario_id) return;
-
     fetch(`http://localhost:3000/api/room?usuario_id=${usuario_id}`, {
       method: 'DELETE'
     })
@@ -74,7 +71,6 @@ const Room = () => {
       .catch(err => console.error('Error al resetear', err));
   };
 
-  // ⬇️ Drag and drop
   const handleMouseDown = (e, index) => {
     setDraggedItemIndex(index);
     const rect = e.target.getBoundingClientRect();
@@ -134,6 +130,11 @@ const Room = () => {
 
   const handleMouseUp = () => setDraggedItemIndex(null);
 
+  const handleCuniClick = () => {
+    setGirar(true);
+    setTimeout(() => setGirar(false), 1000); // Reinicia clase después de animar
+  };
+
   return (
     <div onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}>
       <div className="controls">
@@ -159,6 +160,15 @@ const Room = () => {
           height: '100vh',
         }}
       >
+        {/* 🌟 Protagonista Cuni */}
+        <img
+          src="/img/cuni.png"
+          alt="Cuni"
+          className={`cuni-img ${girar ? 'girar' : ''}`}
+          onClick={handleCuniClick}
+          draggable={false}
+        />
+
         {items.map((item, index) => (
           <img
             key={index}
