@@ -17,8 +17,6 @@ const reporteRoutes = require('./routes/ReporteRoutes');
 const roomRoutes = require('./routes/RoomRoutes');
 const tiendaRoutes = require('./routes/TiendaRoutes');
 
-
-
 // Usar las rutas
 app.use('/api/usuarios', userRoutes);
 app.use('/api/simulacro', simulacroRoutes);
@@ -35,7 +33,12 @@ app.get('/', (req, res) => {
   res.redirect('/index.html');
 });
 
-// Iniciar servidor
-app.listen(PORT, () => {
-  console.log(`✅ Servidor escuchando en: http://localhost:${PORT}`);
-});
+// Iniciar el servidor
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`✅ Servidor escuchando en: http://localhost:${PORT}`);
+  });
+}
+
+// Exportar la app para pruebas
+module.exports = app;
