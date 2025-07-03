@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import {
   Box, Typography, Grid, Card, CardContent, Button, Chip
 } from '@mui/material';
@@ -8,26 +8,22 @@ import { useUsuario } from '../context/UserContext';
 const Inventario = () => {
   const { usuario } = useUsuario();
 
-  // 🟣 Ítems comprados en tienda
   const [items, setItems] = useState([]);
-
-  // 🔵 Ítems colocados en la habitación (Room)
-  const [roomItems, setRoomItems] = useState({}); // Ejemplo: { silla: 2, mesa: 1 }
+  const [roomItems, setRoomItems] = useState({});
 
   // 🟣 Cargar ítems de la tienda del usuario
-  const cargarItems = async () => {
+  const cargarItems = useCallback(async () => {
     try {
       const res = await fetch(`http://localhost:3000/api/tienda/mis-items/${usuario.id}`);
       const data = await res.json();
-      console.log('🧩 Resumen de habitación:', data);
       setItems(data);
     } catch (err) {
       console.error('Error al cargar el inventario:', err);
     }
-  };
+  }, [usuario.id]);
 
   // 🔵 Cargar resumen de ítems del Room del usuario
-  const cargarRoomItems = async () => {
+  const cargarRoomItems = useCallback(async () => {
     try {
       const res = await fetch(`http://localhost:3000/api/room/resumen?usuario_id=${usuario.id}`);
       const data = await res.json();
@@ -35,7 +31,7 @@ const Inventario = () => {
     } catch (err) {
       console.error('Error al cargar ítems de habitación:', err);
     }
-  };
+  }, [usuario.id]);
 
   // 🟣 Activar ítems comprados en la tienda
   const activarItem = async (nombre) => {
@@ -58,11 +54,23 @@ const Inventario = () => {
     }
   };
 
-  // ✅ Cargar ambos tipos de ítems al montar componente
+  // ✅ Agrupar ítems por nombre (para evitar duplicados)
+  const itemsAgrupados = Object.values(
+    items.reduce((acc, item) => {
+      const key = item.nombre;
+      if (!acc[key]) {
+        acc[key] = { ...item, cantidad: 1 };
+      } else {
+        acc[key].cantidad += 1;
+      }
+      return acc;
+    }, {})
+  );
+
   useEffect(() => {
     cargarItems();
     cargarRoomItems();
-  }, [usuario.id]);
+  }, [cargarItems, cargarRoomItems]);
 
   return (
     <Box sx={{ padding: 4, bgcolor: '#FFFCEC', minHeight: '100vh' }}>
@@ -76,7 +84,7 @@ const Inventario = () => {
       </Typography>
 
       <Grid container spacing={3}>
-        {items.map((item) => (
+        {itemsAgrupados.map((item) => (
           <Grid item xs={12} sm={6} md={4} key={item.nombre}>
             <Card sx={{ borderRadius: 3 }} elevation={3}>
               <CardContent>
@@ -84,21 +92,28 @@ const Inventario = () => {
                 <Typography variant="body2" color="text.secondary">{item.tipo}</Typography>
                 <Typography variant="body2" sx={{ mt: 1 }}>Costo: {item.costo} monedas</Typography>
 
-                {item.enUso ? (
-                  <Chip
-                    icon={<CheckCircleIcon />}
-                    label="En uso"
-                    color="success"
-                    sx={{ mt: 2 }}
-                  />
+                {/* Ocultar botón "Usar" para sillas y mesas */}
+                {['silla', 'mesa'].includes(item.tipo.toLowerCase()) ? (
+                  <Typography variant="body2" sx={{ mt: 2 }}>
+                    Total adquiridos: {item.cantidad}
+                  </Typography>
                 ) : (
-                  <Button
-                    variant="contained"
-                    onClick={() => activarItem(item.nombre)}
-                    sx={{ mt: 2, bgcolor: '#7F6FAE', '&:hover': { bgcolor: '#473870' } }}
-                  >
-                    Usar
-                  </Button>
+                  item.enUso ? (
+                    <Chip
+                      icon={<CheckCircleIcon />}
+                      label="En uso"
+                      color="success"
+                      sx={{ mt: 2 }}
+                    />
+                  ) : (
+                    <Button
+                      variant="contained"
+                      onClick={() => activarItem(item.nombre)}
+                      sx={{ mt: 2, bgcolor: '#7F6FAE', '&:hover': { bgcolor: '#473870' } }}
+                    >
+                      Usar
+                    </Button>
+                  )
                 )}
               </CardContent>
             </Card>

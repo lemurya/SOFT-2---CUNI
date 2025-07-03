@@ -33,10 +33,21 @@ class TiendaService {
         db.get(`SELECT * FROM tienda_catalogo WHERE id = ?`, [productoId], (err, producto) => {
           if (err || !producto) return reject({ mensaje: 'Producto no encontrado' });
 
-          db.get(`SELECT * FROM tienda_items_usuario WHERE usuario_id = ? AND nombre = ?`, [usuarioId, producto.nombre], (err, yaComprado) => {
-            if (err) return reject({ mensaje: 'Error al verificar ítem comprado' });
-            if (yaComprado) return reject({ mensaje: 'Este producto ya ha sido comprado' });
+          const esRepetible = producto.tipo === 'silla' || producto.tipo === 'mesa';
 
+          // Solo evitamos duplicados si el ítem no es repetible
+          if (!esRepetible) {
+            db.get(`SELECT * FROM tienda_items_usuario WHERE usuario_id = ? AND nombre = ?`, [usuarioId, producto.nombre], (err, yaComprado) => {
+              if (err) return reject({ mensaje: 'Error al verificar ítem comprado' });
+              if (yaComprado) return reject({ mensaje: 'Este producto ya ha sido comprado' });
+
+              continuarCompra();
+            });
+          } else {
+            continuarCompra();
+          }
+
+          function continuarCompra() {
             db.get(`SELECT * FROM usuarios WHERE id = ?`, [usuarioId], (err, usuario) => {
               if (err || !usuario) return reject({ mensaje: 'Usuario no encontrado' });
 
@@ -67,7 +78,7 @@ class TiendaService {
                 });
               });
             });
-          });
+          }
         });
       });
     });

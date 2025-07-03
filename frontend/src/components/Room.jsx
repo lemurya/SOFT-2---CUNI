@@ -27,16 +27,9 @@ const Room = () => {
       .catch(err => console.error('Error al cargar habitación', err));
   }, [usuario_id]);
 
-  // ➕ Agregar ítem (con validación)
+  // ➕ Agregar ítem (ahora sin límite artificial)
   const addItem = (tipo) => {
     if (!usuario_id) return;
-
-    const count = items.filter(i => i.name === tipo).length;
-    if (count >= 2) {
-      setError(`Inventario insuficiente de ${tipo}`);
-      setTimeout(() => setError(''), 3000);
-      return;
-    }
 
     const newItem = {
       name: tipo,
@@ -68,7 +61,6 @@ const Room = () => {
         setError('Error de conexión');
         setTimeout(() => setError(''), 3000);
       });
-
   };
 
   // 🔄 Reset
