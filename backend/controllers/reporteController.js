@@ -1,11 +1,13 @@
+// controllers/reporteController.js
 const db = require('../database/db');
-const Reporte = require('../models/Reporte');
+const ReporteFactory = require('../factories/ReporteFactory');
 
 const obtenerReportesPorUsuario = async (req, res) => {
   const { userId } = req.params;
 
   try {
-    const reportes = await Reporte.obtenerPorUsuario(db, userId);
+    const reporte = ReporteFactory.crear('porUsuario', userId);
+    const reportes = await reporte.obtener(db);
     res.json({ reportes });
   } catch (error) {
     console.error('Error al obtener reportes:', error);
@@ -17,7 +19,8 @@ const obtenerReportesPorTema = async (req, res) => {
   const { userId, tema } = req.params;
 
   try {
-    const reportes = await Reporte.obtenerPorUsuarioYTema(db, userId, tema);
+    const reporte = ReporteFactory.crear('porTema', userId, tema);
+    const reportes = await reporte.obtener(db);
     res.json({ reportes });
   } catch (error) {
     console.error('Error al obtener reportes por tema:', error);
