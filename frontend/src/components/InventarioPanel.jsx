@@ -6,6 +6,7 @@ import {
   Typography,
   Grid,
   Card,
+  CardMedia,
   CardContent,
   CardActions,
   Button,
@@ -15,49 +16,71 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { useUsuario } from '../context/UserContext';
 
-// Mapa nombre → imagen
-const assetMap = {
-  'Gorro Andino': require('../assets/objetos_tienda/GORRA.png'),
-  'Chaleco de Alpaca': require('../assets/objetos_tienda/chompa.png'),
-  'Bufanda Morada': require('../assets/objetos_tienda/conejo.png'),
-  'Pato': require('../assets/objetos_tienda/PATO.png'),
-  'Sapo': require('../assets/objetos_tienda/SA-PO.png'),
-  'Silla': require('../assets/silla.png'),
-  'Mesa': require('../assets/mesa.png'),
+// 1) Importa tus imágenes
+import gorraImg   from '../assets/objetos_tienda/GORRA.png';
+import chompaImg  from '../assets/objetos_tienda/chompa.png';
+import orejaImg   from '../assets/objetos_tienda/conejo.png';
+import sillaImg   from '../assets/silla.png';
+import mesaImg    from '../assets/mesa.png';
+
+// 2) Mapeos: nombre API → imagen, y nombre API → texto a mostrar
+const imageMap = {
+  'Gorro Andino':      gorraImg,
+  'Chaleco de Alpaca': chompaImg,
+  'Bufanda Morada':    orejaImg,
+  'silla':             sillaImg,
+  'mesa':              mesaImg,
 };
 
-const InventarioPanel = ({ usuarioId }) => {
+const displayMap = {
+  'Chaleco de Alpaca': 'Chompa',
+  'Bufanda Morada':    'Orejas Conejo',
+};
+
+export default function InventarioPanel({ usuarioId }) {
   const { usuario } = useUsuario();
   const [items, setItems] = useState([]);
   const [roomItems, setRoomItems] = useState({});
 
-  // Carga items comprados
+  // Carga los ítems comprados
   const cargarItems = useCallback(async () => {
-    const res = await fetch(`http://localhost:3000/api/tienda/mis-items/${usuarioId}`);
-    const data = await res.json();
-    setItems(data);
+    try {
+      const res = await fetch(`http://localhost:3000/api/tienda/mis-items/${usuarioId}`);
+      const data = await res.json();
+      setItems(data);
+    } catch (err) {
+      console.error('Error cargando inventario:', err);
+    }
   }, [usuarioId]);
 
   // Carga resumen de habitación
   const cargarRoom = useCallback(async () => {
-    const res = await fetch(`http://localhost:3000/api/room/resumen?usuario_id=${usuarioId}`);
-    const data = await res.json();
-    setRoomItems(data);
+    try {
+      const res = await fetch(`http://localhost:3000/api/room/resumen?usuario_id=${usuarioId}`);
+      const data = await res.json();
+      setRoomItems(data);
+    } catch (err) {
+      console.error('Error cargando roomItems:', err);
+    }
   }, [usuarioId]);
 
-  // Activar accesorio
+  // Activa un ítem (lo marca en uso)
   const activar = async nombre => {
-    const res = await fetch(`http://localhost:3000/api/tienda/usar-item`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ usuarioId, itemNombre: nombre })
-    });
-    const data = await res.json();
-    alert(data.mensaje || (res.ok ? 'En uso' : 'Error'));
-    cargarItems();
+    try {
+      const res = await fetch(`http://localhost:3000/api/tienda/usar-item`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ usuarioId, itemNombre: nombre })
+      });
+      const data = await res.json();
+      alert(data.mensaje || (res.ok ? 'En uso' : 'Error'));
+      await cargarItems();
+    } catch (err) {
+      console.error('Error activando ítem:', err);
+    }
   };
 
-  // Agrupa por nombre
+  // Agrupa ítems por nombre para mostrar cantidad de repetibles
   const grouped = Object.values(
     items.reduce((acc, it) => {
       const key = it.nombre;
@@ -72,34 +95,35 @@ const InventarioPanel = ({ usuarioId }) => {
     cargarRoom();
   }, [cargarItems, cargarRoom]);
 
-  const isRepeatable = tipo => ['silla','mesa'].includes(tipo.toLowerCase());
+  const isRepeatable = tipo =>
+    ['silla', 'mesa'].includes(tipo.toLowerCase());
 
   return (
     <Box>
-      {/* Comprados */}
+      {/* Ítems de tienda */}
       <Typography variant="h6" fontWeight="bold" gutterBottom>
         Ítems de tienda
       </Typography>
       <Grid container spacing={2}>
         {grouped.map(item => {
-          const raw = assetMap[item.nombre];
-          const src = raw?.default || raw;
+          // Nombre a mostrar y fuente de la imagen
+          const dispName = displayMap[item.nombre] || item.nombre;
+          const imgSrc   = imageMap[item.nombre]   || imageMap['Gorro Andino'];
           const repeatable = isRepeatable(item.tipo);
 
           return (
-            <Grid item xs={12} key={item.nombre}>
+            <Grid item xs={12} sm={6} key={item.nombre}>
               <Card elevation={2}>
-                {src && (
-                  <Box
-                    component="img"
-                    src={src}
-                    alt={item.nombre}
-                    sx={{ width: '100%', height: 100, objectFit: 'contain', bgcolor: '#fff' }}
-                  />
-                )}
+                <CardMedia
+                  component="img"
+                  height="140"
+                  image={imgSrc}
+                  alt={dispName}
+                  sx={{ objectFit: 'contain', bgcolor: '#fff' }}
+                />
                 <CardContent>
-                  <Typography fontWeight="bold">
-                    {item.nombre} {repeatable ? `(${item.cantidad})` : ''}
+                  <Typography variant="subtitle1" fontWeight="bold">
+                    {dispName} {repeatable ? `(${item.cantidad})` : ''}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     {item.tipo}
@@ -109,7 +133,11 @@ const InventarioPanel = ({ usuarioId }) => {
                   {repeatable ? (
                     <Typography variant="body2">Total: {item.cantidad}</Typography>
                   ) : item.enUso ? (
-                    <Chip icon={<CheckCircleIcon />} label="En uso" color="success" />
+                    <Chip
+                      icon={<CheckCircleIcon />}
+                      label="En uso"
+                      color="success"
+                    />
                   ) : (
                     <Button
                       size="small"
@@ -126,27 +154,28 @@ const InventarioPanel = ({ usuarioId }) => {
         })}
       </Grid>
 
-      {/* Colocados */}
+      {/* Ítems colocados en la habitación */}
       <Typography variant="h6" fontWeight="bold" gutterBottom sx={{ mt: 3 }}>
         Ítems en la habitación
       </Typography>
       <Grid container spacing={2}>
         {Object.entries(roomItems).map(([tipo, cant]) => {
-          const raw = assetMap[tipo];
-          const src = raw?.default || raw;
+          const dispName = displayMap[tipo] || tipo;
+          const imgSrc   = imageMap[tipo]   || imageMap['Gorro Andino'];
           return (
-            <Grid item xs={12} key={tipo}>
+            <Grid item xs={12} sm={6} key={tipo}>
               <Card elevation={2}>
-                {src && (
-                  <Box
-                    component="img"
-                    src={src}
-                    alt={tipo}
-                    sx={{ width: '100%', height: 100, objectFit: 'contain', bgcolor: '#fff' }}
-                  />
-                )}
+                <CardMedia
+                  component="img"
+                  height="140"
+                  image={imgSrc}
+                  alt={dispName}
+                  sx={{ objectFit: 'contain', bgcolor: '#fff' }}
+                />
                 <CardContent>
-                  <Typography fontWeight="bold">{tipo}</Typography>
+                  <Typography variant="subtitle1" fontWeight="bold">
+                    {dispName}
+                  </Typography>
                   <Typography variant="body2" color="text.secondary">
                     Colocados: {cant}
                   </Typography>
@@ -158,6 +187,4 @@ const InventarioPanel = ({ usuarioId }) => {
       </Grid>
     </Box>
   );
-};
-
-export default InventarioPanel;
+}

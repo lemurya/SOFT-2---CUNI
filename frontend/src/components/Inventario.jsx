@@ -20,8 +20,6 @@ const assetMap = {
   'Gorro Andino': require('../assets/objetos_tienda/GORRA.png'),
   'Chaleco de Alpaca': require('../assets/objetos_tienda/chompa.png'),
   'Bufanda Morada': require('../assets/objetos_tienda/conejo.png'),
-  'Pato': require('../assets/objetos_tienda/PATO.png'),
-  'Sapo': require('../assets/objetos_tienda/SA-PO.png'),
   'Silla': require('../assets/silla.png'),
   'Mesa': require('../assets/mesa.png'),
 };

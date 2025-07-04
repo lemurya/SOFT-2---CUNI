@@ -1,3 +1,4 @@
+// db/init.js (o donde tengas la inicialización de tu DB)
 const db = require('./db');
 
 db.serialize(() => {
@@ -93,7 +94,7 @@ db.serialize(() => {
     )
   `);
 
-  // Tabla del catálogo de tienda (incluye ahora silla y mesa)
+  // Catálogo de tienda
   db.run(`
     CREATE TABLE IF NOT EXISTS tienda_catalogo (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -113,14 +114,13 @@ db.serialize(() => {
             INSERT INTO tienda_catalogo (nombre, tipo, costo) VALUES (?, ?, ?)
           `);
 
-          // Accesorios
+          // Ítems de tienda
           stmt.run("Gorro Andino", "accesorio", 20);
           stmt.run("Chaleco de Alpaca", "accesorio", 35);
           stmt.run("Bufanda Morada", "accesorio", 25);
-
-          // 🪑 Ítems decorativos colocables
           stmt.run("Silla", "silla", 15);
           stmt.run("Mesa", "mesa", 25);
+
 
           stmt.finalize(() => {
             console.log("🛍️ Catálogo de tienda inicial insertado.");
@@ -130,7 +130,7 @@ db.serialize(() => {
     }
   });
 
-  // Tabla de ítems comprados por usuario
+  // Tabla de ítems comprados
   db.run(`
     CREATE TABLE IF NOT EXISTS tienda_items_usuario (
       id INTEGER PRIMARY KEY AUTOINCREMENT,

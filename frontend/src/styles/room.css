@@ -1,89 +1,127 @@
+/* src/styles/room.css */
+
+/* 1. Reset básico */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+/* 2. Contenedor principal */
 .room-wrapper {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-  min-height: 100vh;
+  display: flex;
+  height: 100vh;
+  position: relative;
   overflow: hidden;
 }
 
-.room-wrapper .controls {
+/* 3. Barra de controles (botones MUI) */
+.controls {
+  position: absolute;
+  top: 64px;               /* justo debajo de tu AppBar */
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
-  justify-content: center;
-  gap: 1rem;
-  padding: 1rem;
-  background-color: #1a1a1a;
+  gap: 8px;
+  z-index: 1000;
 }
-
-.room-wrapper button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
+.controls button {
+  text-transform: uppercase;
   font-weight: 500;
-  font-family: inherit;
-  background-color: #3a3a3a;
-  color: white;
-  cursor: pointer;
-  transition: border-color 0.25s;
 }
 
-.room-wrapper button:hover {
-  border-color: #7F6FAE;
-}
-
-.room-wrapper .room {
+/* 4. Área de la habitación */
+.room-area {
+  flex: 1;
+  position: relative;
   background-size: cover;
   background-position: center;
-  position: relative;
-  width: 100vw;
-  height: calc(100vh - 80px);
 }
 
-.room-wrapper .item {
-  position: absolute;
-  cursor: grab;
-  width: 180px;
-  user-select: none;
-}
-
-.controls {
-  margin: 16px;
-  display: flex;
-  gap: 12px;
-}
-
-.controls button {
-  background-color: #4a90e2; /* azul bonito */
-  color: white;
-  border: none;
-  padding: 10px 18px;
-  font-size: 16px;
-  border-radius: 6px;
-  cursor: pointer;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16);
-  transition: background-color 0.3s ease, transform 0.1s ease;
-}
-
-.controls button:hover {
-  background-color: #357ABD;
-  transform: scale(1.05);
-}
-
-.controls button:active {
-  transform: scale(0.95);
-}
-
-.cuni-img {
+/* 5. Avatar (cuy o cuy+ropa) centrado y giratorio */
+.avatar-container {
   position: absolute;
   top: 50%;
   left: 50%;
   width: 150px;
+  height: 150px;
   transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+.avatar-base {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: auto;
+  transition: transform 0.8s ease;
   cursor: pointer;
-  z-index: 10;
-  transition: transform 1s;
+  pointer-events: auto;
+}
+.avatar-base:hover {
+  transform: rotate(360deg);
 }
 
-.cuni-img.girar {
-  transform: translate(-50%, -50%) rotate(360deg);
+/* 6. (Opcional) Si sigues usando prendas por separado */
+/* Prenda genérica */
+.avatar-prenda {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+}
+/* Sombrero */
+.avatar-prenda-gorro { top: -10%; left: 10%; width: 80%; }
+/* Chaleco */
+.avatar-prenda-chaleco { top: 30%; left: 5%; width: 90%; }
+/* Bufanda */
+.avatar-prenda-bufanda { top: 40%; left: 5%; width: 90%; }
+/* Pato */
+.avatar-prenda-pato    { top: 60%; left: 80%; width: 30%; }
+/* Sapo */
+.avatar-prenda-sapo    { top: 60%; left: 5%; width: 30%; }
+
+/* 7. Muebles arrastrables */
+.room-item {
+  position: absolute;
+  width: 120px;
+  cursor: grab;
+}
+
+/* 8. Sidebar a la derecha */
+.sidebar {
+  width: 25%;
+  background: #FFFCEC;
+  padding: 16px;
+  box-shadow: -2px 0 5px rgba(0,0,0,0.1);
+  position: relative;
+  overflow-y: auto;
+}
+.close-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+.full-btn {
+  display: block;
+  margin: 16px auto 0;
+}
+
+/* 9. Mensaje de error (opcional) */
+.error {
+  position: absolute;
+  top: 120px;             /* ajusta si cambias la altura de tus controles */
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fdd;
+  color: #900;
+  padding: 8px 16px;
+  border-radius: 4px;
+  z-index: 1010;
 }
