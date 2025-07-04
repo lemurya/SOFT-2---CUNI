@@ -23,15 +23,16 @@ import orejaImg   from '../assets/objetos_tienda/conejo.png';
 import sillaImg   from '../assets/silla.png';
 import mesaImg    from '../assets/mesa.png';
 
-// 2) Mapeos: nombre API → imagen, y nombre API → texto a mostrar
+// 2) Mapeo exacto: nombre que devuelve el backend → imagen
 const imageMap = {
   'Gorro Andino':      gorraImg,
   'Chaleco de Alpaca': chompaImg,
   'Bufanda Morada':    orejaImg,
-  'silla':             sillaImg,
-  'mesa':              mesaImg,
+  'Silla':             sillaImg,
+  'Mesa':              mesaImg,
 };
 
+// Mapeo opcional para mostrar nombres amigables
 const displayMap = {
   'Chaleco de Alpaca': 'Chompa',
   'Bufanda Morada':    'Orejas Conejo',
@@ -42,7 +43,6 @@ export default function InventarioPanel({ usuarioId }) {
   const [items, setItems] = useState([]);
   const [roomItems, setRoomItems] = useState({});
 
-  // Carga los ítems comprados
   const cargarItems = useCallback(async () => {
     try {
       const res = await fetch(`http://localhost:3000/api/tienda/mis-items/${usuarioId}`);
@@ -53,7 +53,6 @@ export default function InventarioPanel({ usuarioId }) {
     }
   }, [usuarioId]);
 
-  // Carga resumen de habitación
   const cargarRoom = useCallback(async () => {
     try {
       const res = await fetch(`http://localhost:3000/api/room/resumen?usuario_id=${usuarioId}`);
@@ -64,7 +63,6 @@ export default function InventarioPanel({ usuarioId }) {
     }
   }, [usuarioId]);
 
-  // Activa un ítem (lo marca en uso)
   const activar = async nombre => {
     try {
       const res = await fetch(`http://localhost:3000/api/tienda/usar-item`, {
@@ -80,7 +78,6 @@ export default function InventarioPanel({ usuarioId }) {
     }
   };
 
-  // Agrupa ítems por nombre para mostrar cantidad de repetibles
   const grouped = Object.values(
     items.reduce((acc, it) => {
       const key = it.nombre;
@@ -106,9 +103,8 @@ export default function InventarioPanel({ usuarioId }) {
       </Typography>
       <Grid container spacing={2}>
         {grouped.map(item => {
-          // Nombre a mostrar y fuente de la imagen
           const dispName = displayMap[item.nombre] || item.nombre;
-          const imgSrc   = imageMap[item.nombre]   || imageMap['Gorro Andino'];
+          const imgSrc   = imageMap[item.nombre] || imageMap['Gorro Andino'];
           const repeatable = isRepeatable(item.tipo);
 
           return (
