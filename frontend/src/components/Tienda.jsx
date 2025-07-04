@@ -1,21 +1,52 @@
 import React, { useEffect, useState } from 'react';
 import {
-  Box, Typography, Grid, Button, Card, CardContent, CardActions
+  Box,
+  Typography,
+  Grid,
+  Button,
+  Card,
+  CardContent,
+  CardActions
 } from '@mui/material';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { useUsuario } from '../context/UserContext';
 
+// 📦 Mapeo nombre → imagen
+const assetMap = {
+  'Gorro Andino': require('../assets/objetos_tienda/GORRA.png'),
+  'Chaleco de Alpaca': require('../assets/objetos_tienda/chompa.png'),
+  'Bufanda Morada': require('../assets/objetos_tienda/conejo.png'),
+  'Pato': require('../assets/objetos_tienda/PATO.png'),
+  'Sapo': require('../assets/objetos_tienda/SA-PO.png'),
+  'Silla': require('../assets/silla.png'),
+  'Mesa': require('../assets/mesa.png'),
+};
+
+// 🏷️ Etiquetas visibles para algunos ítems
+const displayName = {
+  'Bufanda Morada': 'Orejas Conejo',
+  'Chaleco de Alpaca': 'Chompa',
+};
+
 const Tienda = () => {
   const { usuario, setUsuario } = useUsuario();
   const [catalogo, setCatalogo] = useState([]);
-  const [comprados, setComprados] = useState({}); // nombre: cantidad
+  const [comprados, setComprados] = useState({}); // nombre → cantidad
 
-  // 🔄 Cargar catálogo y compras del usuario
+  // 🔄 Obtener catálogo + comprados
   useEffect(() => {
+    // 1) Catálogo con items extra agregados
     fetch('http://localhost:3000/api/tienda/catalogo')
       .then(res => res.json())
-      .then(data => setCatalogo(data));
+      .then(data => {
+        setCatalogo([
+          ...data,
+          { id: 'pato', nombre: 'Pato', costo: 30, tipo: 'accesorio' },
+          { id: 'sapo', nombre: 'Sapo', costo: 20, tipo: 'accesorio' }
+        ]);
+      });
 
+    // 2) Items comprados
     fetch(`http://localhost:3000/api/tienda/mis-items/${usuario.id}`)
       .then(res => res.json())
       .then(data => {
@@ -38,7 +69,6 @@ const Tienda = () => {
       const data = await res.json();
       if (!res.ok) return alert(data.mensaje);
 
-      // 🪙 Actualiza monedas y recuento
       setUsuario(prev => ({ ...prev, monedas: data.monedasRestantes }));
       setComprados(prev => ({
         ...prev,
@@ -51,8 +81,7 @@ const Tienda = () => {
     }
   };
 
-  // Verifica si el ítem es repetible (como silla o mesa)
-  const esRepetible = (tipo) => tipo === 'silla' || tipo === 'mesa';
+  const esRepetible = (tipo) => tipo.toLowerCase() === 'silla' || tipo.toLowerCase() === 'mesa';
 
   return (
     <Box sx={{ padding: 4, bgcolor: '#F3F0FF', minHeight: '100vh' }}>
@@ -68,13 +97,32 @@ const Tienda = () => {
         {catalogo.map(producto => {
           const yaComprado = comprados[producto.nombre] || 0;
           const repetible = esRepetible(producto.tipo);
+          const label = displayName[producto.nombre] || producto.nombre;
+          const rawImg = assetMap[producto.nombre];
+          const img = rawImg?.default || rawImg;
 
           return (
             <Grid item xs={12} sm={6} md={4} key={producto.id}>
-              <Card elevation={4} sx={{ borderRadius: 3 }}>
+              <Card elevation={4} sx={{ borderRadius: 3, textAlign: 'center' }}>
+                {/* 🖼 Imagen del producto */}
+                {img && (
+                  <Box
+                    component="img"
+                    src={img}
+                    alt={label}
+                    sx={{
+                      width: '100%',
+                      height: 140,
+                      objectFit: 'contain',
+                      bgcolor: '#fff',
+                      borderBottom: '1px solid #eee'
+                    }}
+                  />
+                )}
+
                 <CardContent>
                   <Typography variant="h6" fontWeight="bold">
-                    {producto.nombre}
+                    {label}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     {producto.costo} monedas
@@ -85,7 +133,8 @@ const Tienda = () => {
                     </Typography>
                   )}
                 </CardContent>
-                <CardActions>
+
+                <CardActions sx={{ justifyContent: 'center', mb: 1 }}>
                   {!repetible && yaComprado > 0 ? (
                     <Button variant="contained" disabled sx={{ bgcolor: '#ccc' }}>
                       Ya comprado

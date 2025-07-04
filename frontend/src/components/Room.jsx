@@ -5,6 +5,9 @@ import silla from '../assets/silla.png';
 import mesa from '../assets/mesa.png';
 import habitacion from '../assets/room.jpg';
 import '../styles/room.css';
+import { Button, Box } from '@mui/material'; // MUI solo para el panel
+
+import InventarioPanel from './InventarioPanel'; // Asegúrate de tener este archivo
 
 const assetMap = { silla, mesa };
 
@@ -13,7 +16,8 @@ const Room = () => {
   const [draggedItemIndex, setDraggedItemIndex] = useState(null);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [error, setError] = useState('');
-  const [girar, setGirar] = useState(false); // ⭐ Nuevo estado
+  const [girar, setGirar] = useState(false);
+  const [mostrarInventario, setMostrarInventario] = useState(false); // ⭐ Nuevo estado
   const navigate = useNavigate();
 
   const { usuario } = useUsuario();
@@ -40,11 +44,7 @@ const Room = () => {
     fetch('http://localhost:3000/api/room', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        usuario_id,
-        tipo,
-        datos: newItem
-      })
+      body: JSON.stringify({ usuario_id, tipo, datos: newItem })
     })
       .then(async res => {
         const data = await res.json();
@@ -64,9 +64,7 @@ const Room = () => {
 
   const resetRoom = () => {
     if (!usuario_id) return;
-    fetch(`http://localhost:3000/api/room?usuario_id=${usuario_id}`, {
-      method: 'DELETE'
-    })
+    fetch(`http://localhost:3000/api/room?usuario_id=${usuario_id}`, { method: 'DELETE' })
       .then(() => setItems([]))
       .catch(err => console.error('Error al resetear', err));
   };
@@ -97,7 +95,6 @@ const Room = () => {
 
   const updateItemPosition = (index, newItem) => {
     if (!usuario_id) return;
-
     fetch(`http://localhost:3000/api/room/${index}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -115,12 +112,8 @@ const Room = () => {
       await fetch('http://localhost:3000/api/room/guardar', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          usuario_id,
-          items,
-        }),
+        body: JSON.stringify({ usuario_id, items }),
       });
-
       alert('Cambios guardados correctamente.');
     } catch (error) {
       console.error('Error al guardar los cambios:', error);
@@ -132,61 +125,81 @@ const Room = () => {
 
   const handleCuniClick = () => {
     setGirar(true);
-    setTimeout(() => setGirar(false), 1000); // Reinicia clase después de animar
+    setTimeout(() => setGirar(false), 1000);
   };
 
   return (
-    <div onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}>
-      <div className="controls">
-        <button onClick={() => addItem('silla')}>Agregar Silla</button>
-        <button onClick={() => addItem('mesa')}>Agregar Mesa</button>
-        <button onClick={resetRoom}>Resetear Habitación</button>
-        <button onClick={guardarCambios}>Guardar Cambios</button>
-        <button onClick={() => navigate('/inventario')}>Inventario</button>
-      </div>
+    <div onMouseMove={handleMouseMove} onMouseUp={handleMouseUp} style={{ display: 'flex' }}>
+      <div style={{ flex: 1 }}>
+        <div className="controls">
+          <button onClick={() => addItem('silla')}>Agregar Silla</button>
+          <button onClick={() => addItem('mesa')}>Agregar Mesa</button>
+          <button onClick={resetRoom}>Resetear Habitación</button>
+          <button onClick={guardarCambios}>Guardar Cambios</button>
+          <button onClick={() => setMostrarInventario(!mostrarInventario)}>
+            {mostrarInventario ? 'Ocultar Inventario' : 'Mostrar Inventario'}
+          </button>
+          <button onClick={() => navigate('/inventario')}>Ir al Inventario Completo</button>
+        </div>
 
-      {error && (
-        <div style={{ color: 'red', textAlign: 'center', marginBottom: '10px' }}>{error}</div>
-      )}
+        {error && (
+          <div style={{ color: 'red', textAlign: 'center', marginBottom: '10px' }}>{error}</div>
+        )}
 
-      <div
-        className="room"
-        style={{
-          backgroundImage: `url(${habitacion})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          position: 'relative',
-          width: '100vw',
-          height: '100vh',
-        }}
-      >
-        {/* 🌟 Protagonista Cuni */}
-        <img
-          src="/img/cuni.png"
-          alt="Cuni"
-          className={`cuni-img ${girar ? 'girar' : ''}`}
-          onClick={handleCuniClick}
-          draggable={false}
-        />
-
-        {items.map((item, index) => (
+        <div
+          className="room"
+          style={{
+            backgroundImage: `url(${habitacion})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            position: 'relative',
+            width: '100%',
+            height: '90vh',
+          }}
+        >
           <img
-            key={index}
-            src={assetMap[item.imageUrl]}
-            alt={item.name}
-            style={{
-              position: 'absolute',
-              left: item.posX,
-              top: item.posY,
-              width: '180px',
-              cursor: 'grab',
-              userSelect: 'none',
-            }}
-            onMouseDown={(e) => handleMouseDown(e, index)}
+            src="/img/cuni.png"
+            alt="Cuni"
+            className={`cuni-img ${girar ? 'girar' : ''}`}
+            onClick={handleCuniClick}
             draggable={false}
           />
-        ))}
+
+          {items.map((item, index) => (
+            <img
+              key={index}
+              src={assetMap[item.imageUrl]}
+              alt={item.name}
+              style={{
+                position: 'absolute',
+                left: item.posX,
+                top: item.posY,
+                width: '180px',
+                cursor: 'grab',
+                userSelect: 'none',
+              }}
+              onMouseDown={(e) => handleMouseDown(e, index)}
+              draggable={false}
+            />
+          ))}
+        </div>
       </div>
+
+      {/* 📦 Panel lateral de Inventario */}
+      {mostrarInventario && (
+        <Box
+          sx={{
+            width: '350px',
+            height: '100vh',
+            overflowY: 'auto',
+            borderLeft: '1px solid #ccc',
+            bgcolor: '#fafafa',
+            p: 2,
+          }}
+        >
+          <InventarioPanel usuarioId={usuario_id} />
+        </Box>
+      )}
     </div>
   );
 };
