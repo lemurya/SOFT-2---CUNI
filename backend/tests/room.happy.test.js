@@ -1,8 +1,28 @@
 const request = require('supertest');
 const app = require('../index');
+const db = require('../database/db');
 
 describe(':) Happy Path - RoomController', () => {
-  const usuario_id = 1; // asegúrate que este usuario exista en la BD
+  const usuario_id = 1;
+
+  beforeEach(done => {
+    db.serialize(() => {
+      // Limpiar ítems colocados
+      db.run(`DELETE FROM room_items WHERE usuario_id = ?`, [usuario_id]);
+
+      // Limpiar inventario
+      db.run(`DELETE FROM tienda_items_usuario WHERE usuario_id = ?`, [usuario_id]);
+
+      // Insertar sillas y mesas nuevas en el inventario (no en uso)
+      const stmt = db.prepare(`
+        INSERT INTO tienda_items_usuario (usuario_id, nombre, tipo, costo, en_uso)
+        VALUES (?, ?, ?, ?, ?)
+      `);
+      stmt.run(usuario_id, 'Silla C', 'silla', 10, 0);
+      stmt.run(usuario_id, 'Mesa A', 'mesa', 15, 0);
+      stmt.finalize(done);
+    });
+  });
 
   test('GET /api/room debe retornar los ítems colocados en habitación', async () => {
     const res = await request(app).get(`/api/room?usuario_id=${usuario_id}`);
