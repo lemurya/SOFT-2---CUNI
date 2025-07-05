@@ -46,14 +46,14 @@ const CambiarContrasena = () => {
 
   return (
     <Box sx={{ display: 'flex', height: '100vh' }}>
-      {/* Parte izquierda */}
+      
       <Box sx={{ flex: 1, bgcolor: '#836FFF', color: 'white', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
         <img src="/img/cuni.png" alt="Cuni" style={{ width: '200px', marginBottom: 20 }} />
         <Typography variant="h3" sx={{ fontWeight: 'bold', mb: 2 }}>cuni</Typography>
         <Typography variant="h6">¡Prepararte nunca fue tan fácil!</Typography>
       </Box>
 
-      {/* Parte derecha */}
+      
       <Box sx={{ flex: 1, bgcolor: '#FFF8E7', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
         <Paper elevation={3} sx={{ p: 4, width: 400, borderRadius: 4 }}>
           <Typography variant="h5" align="center" gutterBottom>

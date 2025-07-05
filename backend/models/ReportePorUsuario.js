@@ -1,4 +1,3 @@
-// models/ReportePorUsuario.js
 const BaseReporte = require('./BaseReporte');
 const Reporte = require('./Reporte');
 console.log('🧪 obtenerPorUsuario existe:', typeof Reporte.obtenerPorUsuario);

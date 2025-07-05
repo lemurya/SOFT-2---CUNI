@@ -30,10 +30,10 @@ const addRoomItem = async (req, res) => {
     return res.status(400).json({ error: 'Faltan datos requeridos' });
   }
 
-  // Normalizar tipo
+
   const tipoLimpio = tipo.trim().toLowerCase();
 
-  // Reforzar consistencia del imageUrl
+
   const datosLimpios = {
     ...datos,
     imageUrl: tipoLimpio,
@@ -129,7 +129,7 @@ const getRoomItemResumen = async (req, res) => {
   }
 };
 
-//addRoomItem
+
 
 module.exports = { 
   getRoomItems, 

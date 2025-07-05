@@ -12,7 +12,7 @@ export const UserProvider = ({ children }) => {
     setUsuarioState(prev => {
       const actualizado = { ...prev, ...nuevoUsuario };
 
-      // ✅ Guarda solo si hay cambios reales
+     
       const antes = JSON.stringify(prev);
       const despues = JSON.stringify(actualizado);
       if (antes !== despues) {

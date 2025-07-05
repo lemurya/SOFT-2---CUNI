@@ -1,4 +1,4 @@
-// factories/ReporteFactory.js
+
 const ReportePorUsuario = require('../models/ReportePorUsuario');
 const ReportePorTema = require('../models/ReportePorTema');
 

@@ -23,7 +23,7 @@ beforeAll(done => {
 });
 
 beforeEach(done => {
-  // Limpiar antes de cada prueba
+
   db.run(`DELETE FROM reportes`, () => {
     const stmt = db.prepare(`
       INSERT INTO reportes (usuario_id, correctas, total, fecha, tema)

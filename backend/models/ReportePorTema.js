@@ -1,4 +1,3 @@
-// models/ReportePorTema.js
 const BaseReporte = require('./BaseReporte');
 const Reporte = require('./Reporte');
 

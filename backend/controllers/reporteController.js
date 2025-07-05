@@ -1,4 +1,3 @@
-// controllers/reporteController.js
 const db = require('../database/db');
 const ReporteFactory = require('../factories/ReporteFactory');
 

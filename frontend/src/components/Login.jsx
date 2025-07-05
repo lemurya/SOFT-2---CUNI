@@ -6,7 +6,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import { useUsuario } from '../context/UserContext'; // 👈 importante
+import { useUsuario } from '../context/UserContext';
 
 const Login = () => {
   const [correo, setCorreo] = useState('');
@@ -16,7 +16,7 @@ const Login = () => {
   const [aceptaTerminos, setAceptaTerminos] = useState(false);
   const navigate = useNavigate();
 
-  const { setUsuario } = useUsuario(); // 👈 actualiza el contexto global
+  const { setUsuario } = useUsuario();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -38,8 +38,8 @@ const Login = () => {
 
       const data = await res.json();
       if (res.ok) {
-        setUsuario(data.datos); // ✅ actualiza el contexto y localStorage
-        navigate('/dashboard'); // ✅ redirige con usuario listo
+        setUsuario(data.datos); 
+        navigate('/dashboard'); 
       } else {
         setMensaje(data.mensaje || 'Error al iniciar sesión');
       }
@@ -56,7 +56,7 @@ const Login = () => {
         alignItems: 'center', justifyContent: 'center'
       }}>
         <img src="/img/cuni.png" alt="Cuni" style={{ width: '200px', marginBottom: 20 }} />
-        <Typography variant="h3" sx={{ fontWeight: 'bold', mb: 2 }}>cuni</Typography>
+        <Typography variant="h3" sx={{ fontWeight: 'bold', mb: 2 }}>CUNI</Typography>
         <Typography variant="h6">¡Prepararte nunca fue tan fácil!</Typography>
       </Box>
 

@@ -3,7 +3,7 @@ const ProductoCatalogo = require('../models/ProductoCatalogo');
 const ItemInventario = require('../models/ItemInventario');
 
 class TiendaService {
-  // 🛒 Obtener productos del catálogo
+
   async obtenerCatalogo() {
     return new Promise((resolve, reject) => {
       db.all(`SELECT * FROM tienda_catalogo`, (err, rows) => {
@@ -14,18 +14,18 @@ class TiendaService {
     });
   }
 
-  // 🎒 Obtener ítems comprados por el usuario
+
   async obtenerItemsComprados(usuarioId) {
     return new Promise((resolve, reject) => {
       db.all(`SELECT * FROM tienda_items_usuario WHERE usuario_id = ?`, [usuarioId], (err, rows) => {
         if (err) return reject(err);
-        const items = rows.map(row => new ItemInventario(row)); // convierte en_uso → enUso booleano
+        const items = rows.map(row => new ItemInventario(row)); 
         resolve(items);
       });
     });
   }
 
-  // 🛍️ Comprar un ítem del catálogo
+
   async comprarItem(usuarioId, productoId) {
     try {
       const producto = await new Promise((resolve, reject) => {
@@ -50,7 +50,7 @@ class TiendaService {
 
       const nuevasMonedas = usuario.monedas - producto.costo;
 
-      // Actualizar las monedas del usuario
+ 
       await new Promise((resolve, reject) => {
         db.run(`UPDATE usuarios SET monedas = ? WHERE id = ?`, [nuevasMonedas, usuarioId], (err) => {
           if (err) return reject({ mensaje: 'Error al actualizar monedas' });
@@ -58,7 +58,7 @@ class TiendaService {
         });
       });
 
-      // Insertar el ítem comprado
+
       await new Promise((resolve, reject) => {
         db.run(`INSERT INTO tienda_items_usuario (usuario_id, nombre, tipo, costo, en_uso)
                 VALUES (?, ?, ?, ?, 0)`,
@@ -85,15 +85,15 @@ class TiendaService {
     }
   }
 
-  // ✨ Activar ítem (equipar)
+
   async activarItem(usuarioId, itemNombre) {
     return new Promise((resolve, reject) => {
       db.serialize(() => {
-        // Primero desactivar todos los ítems
+        
         db.run(`UPDATE tienda_items_usuario SET en_uso = 0 WHERE usuario_id = ?`, [usuarioId], (err) => {
           if (err) return reject({ mensaje: 'Error limpiando estado' });
 
-          // Luego activar el ítem seleccionado
+          
           db.run(`UPDATE tienda_items_usuario SET en_uso = 1 WHERE usuario_id = ? AND nombre = ?`, [usuarioId, itemNombre], (err2) => {
             if (err2) return reject({ mensaje: 'Error activando ítem' });
 

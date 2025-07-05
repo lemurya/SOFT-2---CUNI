@@ -42,7 +42,7 @@ const responder = (userId, respuesta, indice) => {
   const sesion = sesiones[userId];
   if (!sesion || !sesion.preguntas[indice]) return;
 
-  // Evitar doble evaluación
+  
   if (sesion.respuestas[indice] !== null) return;
 
   const pregunta = sesion.preguntas[indice];

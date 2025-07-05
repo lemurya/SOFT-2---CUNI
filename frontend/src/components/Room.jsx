@@ -5,9 +5,9 @@ import silla from '../assets/silla.png';
 import mesa from '../assets/mesa.png';
 import habitacion from '../assets/room.jpg';
 import '../styles/room.css';
-import { Button, Box } from '@mui/material'; // MUI solo para el panel
+import { Button, Box } from '@mui/material'; 
 
-import InventarioPanel from './InventarioPanel'; // Asegúrate de tener este archivo
+import InventarioPanel from './InventarioPanel'; 
 
 const assetMap = { silla, mesa };
 
@@ -17,7 +17,7 @@ const Room = () => {
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [error, setError] = useState('');
   const [girar, setGirar] = useState(false);
-  const [mostrarInventario, setMostrarInventario] = useState(false); // ⭐ Nuevo estado
+  const [mostrarInventario, setMostrarInventario] = useState(false);
   const navigate = useNavigate();
 
   const { usuario } = useUsuario();
@@ -185,7 +185,7 @@ const Room = () => {
         </div>
       </div>
 
-      {/* 📦 Panel lateral de Inventario */}
+
       {mostrarInventario && (
         <Box
           sx={{

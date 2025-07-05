@@ -1,9 +1,8 @@
-// src/components/AvatarVestido.jsx
 
 import React, { useEffect, useState } from 'react';
 import { useUsuario } from '../context/UserContext';
 
-// Mapa nombre de ítem → PNG combinado (en public/img)
+
 const combinedMap = {
   'Gorro Andino':      '/img/cuyGorra.png',
   'Chaleco de Alpaca': '/img/cuyChompa.png',
@@ -20,14 +19,14 @@ export default function AvatarVestido() {
       .then(res => res.json())
       .then(items => {
         console.log('MIS ITEMS DESDE API:', items);
-        // Encuentra el único ítem que esté en uso
+        
         const activo = items.find(i => i.enUso);
         setEquipped(activo ? activo.nombre : null);
       })
       .catch(console.error);
   }, [usuario.id]);
 
-  // Elegir la imagen combinada o la default
+
   const src = combinedMap[equipped] || combinedMap.default;
 
   return (

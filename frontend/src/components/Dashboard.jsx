@@ -11,7 +11,7 @@ const Dashboard = () => {
   const [cargando, setCargando] = useState(true);
 
   useEffect(() => {
-    // Obtener perfil actualizado
+    
     const obtenerDatos = async () => {
       try {
         const res = await fetch(`http://localhost:3000/api/usuarios/perfil-id?id=${usuario.id}`);

@@ -11,7 +11,6 @@ import {
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { useUsuario } from '../context/UserContext';
 
-// 📦 Mapeo nombre → imagen
 const assetMap = {
   'Gorro Andino': require('../assets/objetos_tienda/GORRA.png'),
   'Chaleco de Alpaca': require('../assets/objetos_tienda/chompa.png'),
@@ -22,7 +21,7 @@ const assetMap = {
   'Mesa': require('../assets/mesa.png'),
 };
 
-// 🏷️ Etiquetas visibles para algunos ítems
+
 const displayName = {
   'Bufanda Morada': 'Orejas Conejo',
   'Chaleco de Alpaca': 'Chompa',
@@ -31,11 +30,11 @@ const displayName = {
 const Tienda = () => {
   const { usuario, setUsuario } = useUsuario();
   const [catalogo, setCatalogo] = useState([]);
-  const [comprados, setComprados] = useState({}); // nombre → cantidad
+  const [comprados, setComprados] = useState({});
 
-  // 🔄 Obtener catálogo + comprados
+
   useEffect(() => {
-    // 1) Catálogo con items extra agregados
+  
     fetch('http://localhost:3000/api/tienda/catalogo')
       .then(res => res.json())
       .then(data => {
@@ -46,7 +45,6 @@ const Tienda = () => {
         ]);
       });
 
-    // 2) Items comprados
     fetch(`http://localhost:3000/api/tienda/mis-items/${usuario.id}`)
       .then(res => res.json())
       .then(data => {
@@ -104,7 +102,7 @@ const Tienda = () => {
           return (
             <Grid item xs={12} sm={6} md={4} key={producto.id}>
               <Card elevation={4} sx={{ borderRadius: 3, textAlign: 'center' }}>
-                {/* 🖼 Imagen del producto */}
+             
                 {img && (
                   <Box
                     component="img"

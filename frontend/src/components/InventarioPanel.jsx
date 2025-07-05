@@ -1,4 +1,4 @@
-// src/components/InventarioPanel.jsx
+
 
 import React, { useEffect, useState, useCallback } from 'react';
 import {
@@ -16,14 +16,14 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { useUsuario } from '../context/UserContext';
 
-// Imágenes
+
 import gorraImg   from '../assets/objetos_tienda/GORRA.png';
 import chompaImg  from '../assets/objetos_tienda/chompa.png';
 import orejaImg   from '../assets/objetos_tienda/conejo.png';
 import sillaImg   from '../assets/silla.png';
 import mesaImg    from '../assets/mesa.png';
 
-// Mapa de imágenes con claves en minúscula
+
 const imageMap = {
   'gorro andino': gorraImg,
   'chaleco de alpaca': chompaImg,
@@ -32,7 +32,7 @@ const imageMap = {
   'mesa': mesaImg,
 };
 
-// Nombres visuales (opcional)
+
 const displayMap = {
   'chaleco de alpaca': 'Chompa',
   'bufanda morada': 'Orejas Conejo',
@@ -99,7 +99,7 @@ export default function InventarioPanel({ usuarioId }) {
 
   return (
     <Box>
-      {/* Ítems de tienda */}
+      
       <Typography variant="h6" fontWeight="bold" gutterBottom>
         Ítems de tienda
       </Typography>
@@ -154,7 +154,7 @@ export default function InventarioPanel({ usuarioId }) {
         })}
       </Grid>
 
-      {/* Ítems colocados en la habitación */}
+      
       <Typography variant="h6" fontWeight="bold" gutterBottom sx={{ mt: 3 }}>
         Ítems en la habitación
       </Typography>

@@ -18,13 +18,13 @@ const Simulacro = () => {
   const [temas] = useState(["matematica", "verbal", "ciencias", "historia"]);
   const navigate = useNavigate();
 
-  // Cargar usuario desde localStorage
+ 
   useEffect(() => {
     const datos = JSON.parse(localStorage.getItem('usuario'));
     if (datos) setUsuario(datos);
   }, []);
 
-  // Iniciar simulacro
+
   const iniciarSimulacro = async () => {
     if (!temaSeleccionado) {
       alert("Por favor selecciona un tema");
@@ -53,7 +53,7 @@ const Simulacro = () => {
     setTemporizadorActivo(true);
   };
 
-  // Enviar respuesta
+
   const responder = async () => {
     if (!respuesta) {
       alert("Por favor selecciona una respuesta");
@@ -86,7 +86,7 @@ const Simulacro = () => {
     }
   };
 
-  // Ver resultados
+
   const verResultados = async () => {
     const res = await fetch(`http://localhost:3000/api/simulacro/${usuario.id}/resultados`);
     const data = await res.json();
@@ -101,7 +101,7 @@ const Simulacro = () => {
     navigate('/resultados', { state: data });
   };
 
-  // Temporizador
+
   useEffect(() => {
     let intervalo = null;
 
@@ -174,7 +174,7 @@ const Simulacro = () => {
           </Box>
         ) : (
           <Box>
-            {/* Botones de navegación por pregunta */}
+  
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
               {preguntas.map((_, index) => {
                 const estado = respondidas[index];

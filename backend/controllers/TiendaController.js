@@ -40,7 +40,6 @@ class TiendaController {
     }
   }
 
-  // ✅ NUEVO: activar ítem comprado
   async usarItem(req, res) {
     const { usuarioId, itemNombre } = req.body;
 

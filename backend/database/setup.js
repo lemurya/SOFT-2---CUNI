@@ -1,7 +1,7 @@
 const db = require('./db');
 
 db.serialize(() => {
-  // Tabla de usuarios
+
   db.run(`
     CREATE TABLE IF NOT EXISTS usuarios (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -14,7 +14,7 @@ db.serialize(() => {
     )
   `);
 
-  // Tabla de preguntas
+
   db.run(`
     CREATE TABLE IF NOT EXISTS preguntas (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -64,12 +64,12 @@ db.serialize(() => {
       }
 
       stmt.finalize(() => {
-        console.log("✅ Preguntas iniciales insertadas en la base de datos.");
+        console.log("Preguntas iniciales insertadas en la base de datos.");
       });
     }
   });
 
-  // Tabla de reportes
+
   db.run(`
     CREATE TABLE IF NOT EXISTS reportes (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -82,7 +82,7 @@ db.serialize(() => {
     )
   `);
 
-  // Tabla de ítems de la habitación
+
   db.run(`
     CREATE TABLE IF NOT EXISTS room_items (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -93,7 +93,7 @@ db.serialize(() => {
     )
   `);
 
-  // Tabla del catálogo de tienda (incluye ahora silla y mesa)
+
   db.run(`
     CREATE TABLE IF NOT EXISTS tienda_catalogo (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -113,12 +113,12 @@ db.serialize(() => {
             INSERT INTO tienda_catalogo (nombre, tipo, costo) VALUES (?, ?, ?)
           `);
 
-          // Accesorios
+         
           stmt.run("Gorro Andino", "accesorio", 20);
           stmt.run("Chaleco de Alpaca", "accesorio", 35);
           stmt.run("Bufanda Morada", "accesorio", 25);
 
-          // 🪑 Ítems decorativos colocables
+          
           stmt.run("Silla", "silla", 15);
           stmt.run("Mesa", "mesa", 25);
 
@@ -130,7 +130,7 @@ db.serialize(() => {
     }
   });
 
-  // Tabla de ítems comprados por usuario
+
   db.run(`
     CREATE TABLE IF NOT EXISTS tienda_items_usuario (
       id INTEGER PRIMARY KEY AUTOINCREMENT,

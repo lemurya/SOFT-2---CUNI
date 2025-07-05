@@ -7,13 +7,13 @@ describe(':) Happy Path - RoomController', () => {
 
   beforeEach(done => {
     db.serialize(() => {
-      // Limpiar ítems colocados
+      
       db.run(`DELETE FROM room_items WHERE usuario_id = ?`, [usuario_id]);
 
-      // Limpiar inventario
+      
       db.run(`DELETE FROM tienda_items_usuario WHERE usuario_id = ?`, [usuario_id]);
 
-      // Insertar sillas y mesas nuevas en el inventario (no en uso)
+      
       const stmt = db.prepare(`
         INSERT INTO tienda_items_usuario (usuario_id, nombre, tipo, costo, en_uso)
         VALUES (?, ?, ?, ?, ?)

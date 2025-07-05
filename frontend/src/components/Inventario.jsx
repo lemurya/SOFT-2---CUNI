@@ -1,4 +1,3 @@
-// src/components/Inventario.jsx
 
 import React, { useEffect, useState, useCallback } from 'react';
 import {
@@ -15,7 +14,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { useUsuario } from '../context/UserContext';
 
-// 🖼️ Mapea nombre → ruta de imagen
+
 const assetMap = {
   'Gorro Andino': require('../assets/objetos_tienda/GORRA.png'),
   'Chaleco de Alpaca': require('../assets/objetos_tienda/chompa.png'),
@@ -29,7 +28,7 @@ const Inventario = () => {
   const [items, setItems] = useState([]);
   const [roomItems, setRoomItems] = useState({});
 
-  // 🟣 Cargar ítems comprados
+
   const cargarItems = useCallback(async () => {
     try {
       const res = await fetch(`http://localhost:3000/api/tienda/mis-items/${usuario.id}`);
@@ -40,7 +39,7 @@ const Inventario = () => {
     }
   }, [usuario.id]);
 
-  // 🔵 Cargar resumen de ítems colocados
+
   const cargarRoomItems = useCallback(async () => {
     try {
       const res = await fetch(`http://localhost:3000/api/room/resumen?usuario_id=${usuario.id}`);
@@ -51,7 +50,6 @@ const Inventario = () => {
     }
   }, [usuario.id]);
 
-  // 🔄 Activar ítem no repetible
   const activarItem = async (nombre) => {
     try {
       const res = await fetch(`http://localhost:3000/api/tienda/usar-item`, {
@@ -61,14 +59,14 @@ const Inventario = () => {
       });
       const data = await res.json();
       alert(data.mensaje || (res.ok ? '¡Item en uso!' : 'Error al activar'));
-      cargarItems(); // Recargar
+      cargarItems(); 
     } catch (err) {
       console.error(err);
       alert('Error en la conexión');
     }
   };
 
-  // ✅ Agrupar por nombre
+
   const itemsAgrupados = Object.values(
     items.reduce((acc, item) => {
       const key = item.nombre;
@@ -92,7 +90,7 @@ const Inventario = () => {
         Inventario
       </Typography>
 
-      {/* 🟣 Ítems de tienda */}
+
       <Typography variant="h5" fontWeight="bold" sx={{ mt: 2 }} color="#7F6FAE">
         Ítems comprados en tienda
       </Typography>
@@ -153,7 +151,7 @@ const Inventario = () => {
         })}
       </Grid>
 
-      {/* 🔵 Ítems en la habitación */}
+
       <Typography variant="h5" fontWeight="bold" sx={{ mt: 5 }} color="#7F6FAE">
         Ítems colocados en la habitación
       </Typography>

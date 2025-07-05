@@ -22,7 +22,7 @@ describe('TiendaController.usarItem', () => {
     jest.clearAllMocks();
   });
 
-  it('✅ debe activar un ítem correctamente', async () => {
+  it('debe activar un item correctamente', async () => {
     const resultadoMock = { mensaje: 'Ítem activado', en_uso: true };
     tiendaService.activarItem.mockResolvedValue(resultadoMock);
 
@@ -32,8 +32,8 @@ describe('TiendaController.usarItem', () => {
     expect(res.json).toHaveBeenCalledWith(resultadoMock);
   });
 
-  it('❌ debe retornar error 400 si faltan datos', async () => {
-    req.body = {}; // sin usuarioId ni itemNombre
+  it('debe retornar error 400 si faltan datos', async () => {
+    req.body = {};
 
     await TiendaController.usarItem(req, res);
 
@@ -41,7 +41,7 @@ describe('TiendaController.usarItem', () => {
     expect(res.json).toHaveBeenCalledWith({ mensaje: 'Faltan datos para activar ítem' });
   });
 
-  it('❌ debe manejar errores del servicio con 500', async () => {
+  it('debe manejar errores del servicio con 500', async () => {
     tiendaService.activarItem.mockRejectedValue(new Error('Error interno'));
 
     await TiendaController.usarItem(req, res);
@@ -50,7 +50,7 @@ describe('TiendaController.usarItem', () => {
     expect(res.json).toHaveBeenCalledWith(expect.any(Error));
   });
 
-  it('🛡️ debe validar que el servicio fue llamado una vez', async () => {
+  it('debe validar que el servicio fue llamado una vez', async () => {
     tiendaService.activarItem.mockResolvedValue({ ok: true });
 
     await TiendaController.usarItem(req, res);

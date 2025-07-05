@@ -120,12 +120,12 @@ class RoomManager {
       );
     });
   
-    // Refrescar caché
+
     this.rooms.delete(usuarioId);
   }
   
   async guardarCambios(usuarioId, items) {
-    // 1. Eliminar todos los ítems anteriores del usuario
+    
     await new Promise((resolve, reject) => {
       db.run(
         'DELETE FROM room_items WHERE usuario_id = ?',
@@ -137,7 +137,7 @@ class RoomManager {
       );
     });
   
-    // 2. Insertar nuevos ítems con sus posiciones actualizadas
+    
     for (const item of items) {
       const tipo = item.name;
   
@@ -153,7 +153,7 @@ class RoomManager {
       });
     }
   
-    // 3. Limpiar caché del room
+    
     this.rooms.delete(usuarioId);
   }  
   
@@ -173,7 +173,7 @@ class RoomManager {
   
               const total = rows1[0].total;
               const colocados = rows2[0].colocados;
-              resolve(total > colocados); // si aún tiene disponibles
+              resolve(total > colocados); 
             }
           );
         }
